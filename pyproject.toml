@@ -1,0 +1,19 @@
+[project]
+name = 'combustache'
+readme = 'README.md'
+license = { file = 'LICENSE' }
+version = '0.0.1'
+
+[project.urls]
+Homepage = 'https://github.com/sakhezech/combustache'
+
+[tool.ruff]
+line-length = 79
+[tool.ruff.format]
+quote-style = 'single'
+[tool.ruff.lint]
+extend-select = ['I', 'E501']
+
+[build-system]
+requires = ['hatchling']
+build-backend = 'hatchling.build'
