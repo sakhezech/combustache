@@ -1,3 +1,3 @@
-from combustache.render import render
+from combustache.render import cache_clear, render
 
-__all__ = ['render']
+__all__ = ['render', 'cache_clear']
