@@ -32,8 +32,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
@@ -43,6 +41,9 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install .
-      - name: Running tests
+      - name: Analysing formatting
         run: |
-          pytest .
+          ruff format --check .
+      - name: Analysing code
+        run: |
+          ruff check .
