@@ -1,11 +1,16 @@
 [project]
 name = 'combustache'
 readme = 'README.md'
+description = ''
 license = { file = 'LICENSE' }
-version = '0.0.1'
+dependencies = []
+dynamic = ['version']
 
 [project.urls]
 Homepage = 'https://github.com/sakhezech/combustache'
+
+[project.scripts]
+combustache = 'combustache.__main__:main'
 
 [tool.ruff]
 line-length = 79
@@ -13,6 +18,9 @@ line-length = 79
 quote-style = 'single'
 [tool.ruff.lint]
 extend-select = ['I', 'E501']
+
+[tool.hatch.version]
+path = 'src/combustache/__version__.py'
 
 [build-system]
 requires = ['hatchling']
