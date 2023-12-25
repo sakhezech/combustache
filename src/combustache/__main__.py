@@ -6,7 +6,7 @@ from combustache.__version__ import __version__
 from combustache.render import render
 
 
-def main(arglist: Sequence[str] | None = None):
+def cli(argv: Sequence[str] | None = None):
     parser = argparse.ArgumentParser(
         prog='combustache',
         description='explosive mustache v1.3 implementation with lambdas',
@@ -55,7 +55,7 @@ def main(arglist: Sequence[str] | None = None):
         help='partial file (can add multiple)',
     )
 
-    args = parser.parse_args(arglist)
+    args = parser.parse_args(argv)
 
     if args.string:
         template = args.template + '\n'
@@ -78,4 +78,4 @@ def main(arglist: Sequence[str] | None = None):
 
 
 if __name__ == '__main__':
-    main()
+    cli()

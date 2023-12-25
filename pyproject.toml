@@ -10,7 +10,7 @@ dynamic = ['version']
 Homepage = 'https://github.com/sakhezech/combustache'
 
 [project.scripts]
-combustache = 'combustache.__main__:main'
+combustache = 'combustache.__main__:cli'
 
 [tool.ruff]
 line-length = 79
