@@ -15,8 +15,8 @@ def main(arglist: Sequence[str] | None = None):
     parser.add_argument(
         '-v',
         '--version',
-        action='store_true',
-        help='print program version and exit',
+        action='version',
+        version=__version__,
     )
 
     parser.add_argument(
@@ -56,9 +56,6 @@ def main(arglist: Sequence[str] | None = None):
     )
 
     args = parser.parse_args(arglist)
-    if args.version:
-        print(__version__)
-        return
 
     if args.string:
         template = args.template + '\n'
