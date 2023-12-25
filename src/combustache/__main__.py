@@ -47,6 +47,14 @@ def main(arglist: Sequence[str] | None = None):
         help='output file (defaults to stdout)',
     )
 
+    parser.add_argument(
+        '-p',
+        '--partial',
+        type=argparse.FileType(),
+        action='append',
+        help='partial file (can add multiple)',
+    )
+
     args = parser.parse_args(arglist)
     if args.version:
         print(__version__)
@@ -58,8 +66,15 @@ def main(arglist: Sequence[str] | None = None):
         with open(args.template) as f:
             template = f.read()
 
+    if args.partial is None:
+        args.partial = []
+
     data = json.load(args.data)
-    partials = {}
+    partials = {
+        key: value
+        for file in args.partial
+        for key, value in json.load(file).items()
+    }
 
     output = render(template, data, partials)
     args.output.write(output)
