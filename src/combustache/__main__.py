@@ -92,7 +92,6 @@ def cli(argv: Sequence[str] | None = None):
 
     output = render(template, data, partials)
     args.output.write(output)
-    args.output.write('\n')
 
 
 if __name__ == '__main__':
