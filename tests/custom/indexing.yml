@@ -12,7 +12,7 @@ tests:
     template: I am {{list.0}}
     expected: I am here
 
-  - name: Indexing - sdfsdf
+  - name: Indexing - Chain
     desc: Indexing should let you chain further
     data:
       list:
@@ -43,7 +43,7 @@ tests:
     template: the last item is {{list.-1}}
     expected: the last item is three
 
-  - name: Indexing - Chain
+  - name: Indexing - Chain indexing
     desc: Chained indexing should work
     data:
       list:
