@@ -1,5 +1,6 @@
 import argparse
 import json
+from pathlib import Path
 from typing import Sequence
 
 from combustache.__version__ import __version__
@@ -55,10 +56,21 @@ def cli(argv: Sequence[str] | None = None):
         help='partial file (can add multiple)',
     )
 
+    parser.add_argument(
+        '--partial-dir',
+        help='directory with mustache partials',
+    )
+
+    parser.add_argument(
+        '--partial-pattern',
+        default='**/*.mustache',
+        help='partial file pattern (defaults to **/*.mustache)',
+    )
+
     args = parser.parse_args(argv)
 
     if args.string:
-        template = args.template + '\n'
+        template = args.template
     else:
         with open(args.template) as f:
             template = f.read()
@@ -67,14 +79,20 @@ def cli(argv: Sequence[str] | None = None):
         args.partial = []
 
     data = json.load(args.data)
-    partials = {
-        key: value
-        for file in args.partial
-        for key, value in json.load(file).items()
-    }
+
+    partials = {}
+    for file in args.partial:
+        partials.update(json.load(file))
+    if args.partial_dir:
+        dir_path = Path(args.partial_dir)
+        partial_paths = dir_path.rglob(args.partial_pattern)
+        for path in partial_paths:
+            with path.open() as file:
+                partials.update(json.load(file))
 
     output = render(template, data, partials)
     args.output.write(output)
+    args.output.write('\n')
 
 
 if __name__ == '__main__':
