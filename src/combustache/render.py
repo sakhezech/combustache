@@ -201,7 +201,7 @@ class Section(Node):
                     break
                 i -= 1
         if found is None:
-            raise ValueError(
+            raise ClosingTagError(
                 f'No closing tag found for {self.content} at {self.start}'
             )
 
@@ -287,7 +287,7 @@ class Delimiter(Node):
         )
         split = self.content.split()
         if len(split) > 2:
-            raise ValueError(f'Impossible delimiter tag at {self.start}.')
+            raise DelimiterError(f'Impossible delimiter tag at {self.start}.')
         self.left_delimiter = split[0]
         self.right_delimiter = split[1]
 
@@ -355,6 +355,18 @@ def create_node(
             return Partial(**kwargs)
         case (_, _):
             return Interpolation(**kwargs)
+
+
+class CombustacheError(Exception):
+    pass
+
+
+class DelimiterError(CombustacheError):
+    pass
+
+
+class ClosingTagError(CombustacheError):
+    pass
 
 
 def _render(
