@@ -381,6 +381,21 @@ def _render(
 
 
 def render(template: str, data: dict, partials: dict | None = None) -> str:
+    """
+    Renders a mustache template.
+
+    Args:
+        template (str): Mustache template
+        data (dict): Values to insert into the template
+        partials (dict | None): Partials to use while rendering
+
+    Returns:
+        str: Rendered template
+
+    Raises:
+        DelimiterError: Bad delimiter tag
+        ClosingTagError: No closing tag
+    """
     if partials is None:
         partials = {}
     ctx = Ctx([data])
@@ -388,4 +403,7 @@ def render(template: str, data: dict, partials: dict | None = None) -> str:
 
 
 def cache_clear():
+    """
+    Clears cached templates.
+    """
     Root.create_cached.cache_clear()
