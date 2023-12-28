@@ -20,8 +20,8 @@ tests:
         - { content: hello }
         - { content: bye }
         - { content: bye }
-    template: "{{list.1.content}} is a greating"
-    expected: hello is a greating
+    template: "{{list.1.content}} is a greeting"
+    expected: hello is a greeting
 
   - name: Indexing - Outside
     desc: Indexing outside the list should interpolate as an empty string
