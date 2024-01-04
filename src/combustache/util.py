@@ -2,6 +2,7 @@ import re
 from typing import Any
 
 CONTENT = 'content'
+LAMBDA = '<lambda>'
 
 
 def construct_regex_pattern(

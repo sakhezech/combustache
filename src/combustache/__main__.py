@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Sequence
 
 from combustache.__version__ import __version__
-from combustache.render import render
+from combustache.main import render
 
 
 def cli(argv: Sequence[str] | None = None):
