@@ -119,7 +119,7 @@ def render(
     Args:
         template (str): Mustache template.
         data (dict): Values to insert into the template.
-        partials (dict | None): Partials to use while rendering.
+        partials (dict): Partials to use while rendering.
         left_delimiter (str): Left tag delimiter.
         right_delimiter (str): Right tag delimiter.
 
