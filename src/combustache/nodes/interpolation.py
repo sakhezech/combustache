@@ -3,9 +3,7 @@ import html
 import combustache.main
 from combustache.ctx import Ctx
 from combustache.nodes.node import Node
-from combustache.util import is_callable, to_str
-
-LAMBDA = '<lambda>'
+from combustache.util import LAMBDA, is_callable, to_str
 
 
 class Interpolation(Node):
