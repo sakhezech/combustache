@@ -1,6 +1,6 @@
+import functools
 import html
 import re
-from functools import cache
 
 from combustache.ctx import Ctx
 from combustache.util import (
@@ -67,72 +67,8 @@ class Node:
             .strip()
         )
 
-    def parse(self, start: int, end: int):
-        pattern = construct_regex_pattern(
-            self.left_delimiter, self.right_delimiter
-        )
-
-        while True:
-            match = pattern.search(self.template, start, end)
-            if match is None:
-                self.inside.append(self.template[start:end])
-                break
-
-            node = create_node(
-                match,
-                self.template,
-                self.template_start,
-                self.template_end,
-                self.left_delimiter,
-                self.right_delimiter,
-            )
-
-            # make this better?
-            if isinstance(node, Delimiter):
-                self.left_delimiter = node.left_delimiter
-                self.right_delimiter = node.right_delimiter
-                pattern = construct_regex_pattern(
-                    self.left_delimiter, self.right_delimiter
-                )
-
-            self.inside.append(self.template[start : node.start])
-            if not node.ignorable:
-                self.inside.append(node)
-            start = node.parse_end
-
     def handle(self, ctx: Ctx, partials: dict) -> str:
         raise NotImplementedError
-
-
-class Root(Node):
-    def __init__(
-        self,
-        template: str,
-        left_delimiter: str,
-        right_delimiter: str,
-    ) -> None:
-        self.template = template
-        self.template_start = 0
-        self.template_end = len(template)
-        self.left_delimiter = left_delimiter
-        self.right_delimiter = right_delimiter
-        self.inside: list[str | Node] = []
-        self.parse(self.template_start, self.template_end)
-
-    def handle(self, ctx: Ctx, partials: dict) -> str:
-        return ''.join(
-            [
-                i if isinstance(i, str) else i.handle(ctx, partials)
-                for i in self.inside
-            ]
-        )
-
-    @cache
-    @staticmethod
-    def create_cached(
-        template: str, left_delimiter: str, right_delimiter: str
-    ):
-        return Root(template, left_delimiter, right_delimiter)
 
 
 class Interpolation(Node):
@@ -217,7 +153,13 @@ class Section(Node):
         self.inside_start = self.end
         self.inside_end = closing_tag.start
         self.parse_end = closing_tag.end
-        self.parse(self.inside_start, self.inside_end)
+        self.inside = parse(
+            self.template,
+            self.inside_start,
+            self.inside_end,
+            self.left_delimiter,
+            self.right_delimiter,
+        )
 
     def should_not_be_rendered(self, item):
         return not item
@@ -327,7 +269,7 @@ def create_node(
     end: int,
     left_delimiter: str,
     right_delimiter: str,
-):
+) -> Node:
     content = match.group(CONTENT)
     first_char, last_char = content[0], content[-1]
     kwargs = {
@@ -369,6 +311,48 @@ class ClosingTagError(CombustacheError):
     pass
 
 
+@functools.cache
+def parse(
+    template: str,
+    template_start: int,
+    template_end: int,
+    left_delimiter: str = '{{',
+    right_delimiter: str = '}}',
+) -> list[Node | str]:
+    res = []
+
+    pattern = construct_regex_pattern(left_delimiter, right_delimiter)
+    start = template_start
+    end = template_end
+
+    while True:
+        match = pattern.search(template, start, end)
+        if match is None:
+            res.append(template[start:end])
+            break
+
+        node = create_node(
+            match,
+            template,
+            template_start,
+            template_end,
+            left_delimiter,
+            right_delimiter,
+        )
+
+        # make this better?
+        if isinstance(node, Delimiter):
+            left_delimiter = node.left_delimiter
+            right_delimiter = node.right_delimiter
+            pattern = construct_regex_pattern(left_delimiter, right_delimiter)
+
+        res.append(template[start : node.start])
+        if not node.ignorable:
+            res.append(node)
+        start = node.parse_end
+    return res
+
+
 def _render(
     template: str,
     ctx: Ctx,
@@ -376,34 +360,47 @@ def _render(
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
 ) -> str:
-    root = Root.create_cached(template, left_delimiter, right_delimiter)
-    return root.handle(ctx, partials)
+    root = parse(template, 0, len(template), left_delimiter, right_delimiter)
+    return ''.join(
+        [
+            piece.handle(ctx, partials) if isinstance(piece, Node) else piece
+            for piece in root
+        ]
+    )
 
 
-def render(template: str, data: dict, partials: dict | None = None) -> str:
+def render(
+    template: str,
+    data: dict,
+    partials: dict | None = None,
+    left_delimiter: str = '{{',
+    right_delimiter: str = '}}',
+) -> str:
     """
     Renders a mustache template.
 
     Args:
-        template (str): Mustache template
-        data (dict): Values to insert into the template
-        partials (dict | None): Partials to use while rendering
+        template (str): Mustache template.
+        data (dict): Values to insert into the template.
+        partials (dict | None): Partials to use while rendering.
+        left_delimiter (str): Left tag delimiter.
+        right_delimiter (str): Right tag delimiter.
 
     Returns:
-        str: Rendered template
+        str: Rendered template.
 
     Raises:
-        DelimiterError: Bad delimiter tag
-        ClosingTagError: No closing tag
+        DelimiterError: Bad delimiter tag.
+        ClosingTagError: No closing tag.
     """
     if partials is None:
         partials = {}
     ctx = Ctx([data])
-    return _render(template, ctx, partials)
+    return _render(template, ctx, partials, left_delimiter, right_delimiter)
 
 
 def cache_clear():
     """
     Clears cached templates.
     """
-    Root.create_cached.cache_clear()
+    parse.cache_clear()
