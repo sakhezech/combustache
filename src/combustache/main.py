@@ -1,5 +1,4 @@
 import functools
-import re
 
 from combustache.ctx import Ctx
 from combustache.nodes.comment import Comment
@@ -12,20 +11,23 @@ from combustache.util import CONTENT, construct_regex_pattern
 
 
 def create_node(
-    match: re.Match,
+    content: str,
+    tag_start: int,
+    tag_end: int,
     template: str,
-    start: int,
-    end: int,
+    template_start: int,
+    template_end: int,
     left_delimiter: str,
     right_delimiter: str,
 ) -> Node:
-    content = match.group(CONTENT)
     first_char, last_char = content[0], content[-1]
     kwargs = {
-        'match': match,
+        'content': content,
+        'tag_start': tag_start,
+        'tag_end': tag_end,
         'template': template,
-        'start': start,
-        'end': end,
+        'template_start': template_start,
+        'template_end': template_end,
         'left_delimiter': left_delimiter,
         'right_delimiter': right_delimiter,
     }
@@ -68,8 +70,13 @@ def parse(
             res.append(template[start:end])
             break
 
+        tag_start = match.start()
+        tag_end = match.end()
+        content = match.group(CONTENT)
         node = create_node(
-            match,
+            content,
+            tag_start,
+            tag_end,
             template,
             template_start,
             template_end,

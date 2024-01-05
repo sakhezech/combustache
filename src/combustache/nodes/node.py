@@ -1,7 +1,5 @@
-import re
-
 from combustache.ctx import Ctx
-from combustache.util import CONTENT, is_whitespace
+from combustache.util import is_whitespace
 
 
 class Node:
@@ -12,22 +10,21 @@ class Node:
 
     def __init__(
         self,
-        match: re.Match,
+        content: str,
+        tag_start: int,
+        tag_end: int,
         template: str,
-        start: int,
-        end: int,
+        template_start: int,
+        template_end: int,
         left_delimiter: str,
         right_delimiter: str,
     ) -> None:
         self.template = template
-        self.template_start = start
-        self.template_end = end
+        self.template_start = template_start
+        self.template_end = template_end
         self.left_delimiter = left_delimiter
         self.right_delimiter = right_delimiter
         self.inside: list[str | Node] = []
-
-        tag_start = match.start()
-        tag_end = match.end()
 
         # we +1 to line_start and line_end to get 'hello\n' instad of '\nhello'
         # and we get a nice side effect for end of getting 0 if we dont find \n
@@ -51,10 +48,7 @@ class Node:
         self.parse_end = self.end
 
         self.content = (
-            match.group(CONTENT)
-            .removeprefix(self.left)
-            .removesuffix(self.right)
-            .strip()
+            content.removeprefix(self.left).removesuffix(self.right).strip()
         )
 
     def handle(self, ctx: Ctx, partials: dict) -> str:

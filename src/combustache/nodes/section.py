@@ -17,15 +17,24 @@ class Section(Node):
 
     def __init__(
         self,
-        match: re.Match,
+        content: str,
+        tag_start: int,
+        tag_end: int,
         template: str,
-        start: int,
-        end: int,
+        template_start: int,
+        template_end: int,
         left_delimiter: str,
         right_delimiter: str,
     ) -> None:
         super().__init__(
-            match, template, start, end, left_delimiter, right_delimiter
+            content,
+            tag_start,
+            tag_end,
+            template,
+            template_start,
+            template_end,
+            left_delimiter,
+            right_delimiter,
         )
         pattern = construct_regex_pattern(
             self.left_delimiter,
@@ -51,8 +60,13 @@ class Section(Node):
                 f'No closing tag found for {self.content} at {self.start}'
             )
 
+        found_start = found.start()
+        found_end = found.end()
+        found_content = found.group(CONTENT)
         closing_tag = Closing(
-            found,
+            found_content,
+            found_start,
+            found_end,
             self.template,
             self.template_start,
             self.template_end,
