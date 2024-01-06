@@ -20,6 +20,17 @@ Typical usage as CLI: ::
     $ cat out.txt
     Hello world!
 """
+from combustache.exceptions import (
+    ClosingTagError,
+    CombustacheError,
+    DelimiterError,
+)
 from combustache.main import cache_clear, render
 
-__all__ = ['render', 'cache_clear']
+__all__ = [
+    'render',
+    'cache_clear',
+    'CombustacheError',
+    'DelimiterError',
+    'ClosingTagError',
+]
