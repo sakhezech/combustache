@@ -10,8 +10,9 @@ class Ctx(list):
             return self[-1]
 
         chain = key.split('.')
+        reverse = reversed(self)
         found = None
-        for item in self[::-1]:
+        for item in reverse:
             found = get_inside(item, chain[0])
             if found is not None:
                 break
