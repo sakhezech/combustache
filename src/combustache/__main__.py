@@ -67,6 +67,18 @@ def cli(argv: Sequence[str] | None = None):
         help='partial file pattern (defaults to **/*.mustache)',
     )
 
+    parser.add_argument(
+        '--left-delimiter',
+        default='{{',
+        help="left mustache template demimiter (defaults to '{{')",
+    )
+
+    parser.add_argument(
+        '--right-delimiter',
+        default='}}',
+        help="right mustache template demimiter (defaults to '}}')",
+    )
+
     args = parser.parse_args(argv)
 
     if args.string:
@@ -90,7 +102,10 @@ def cli(argv: Sequence[str] | None = None):
             with path.open() as file:
                 partials.update(json.load(file))
 
-    output = render(template, data, partials)
+    left_delimiter = args.left_delimiter
+    right_delimiter = args.right_delimiter
+
+    output = render(template, data, partials, left_delimiter, right_delimiter)
     args.output.write(output)
 
 

@@ -1,7 +1,8 @@
 import pytest
 
 TEMPLATE = """
-{{firstName}} {{lastName}} {{>id}} is an {{occupation}}
+<%firstName%> <%lastName%> <%>id%> is an <%occupation%>
+<%= {{ }} =%>
 Affirmatives:
 {{#affirmatives}}
   {{>affirmative}}
@@ -11,6 +12,7 @@ Affirmatives:
  3. {{affirmatives.3.status}}
 -1. {{affirmatives.-1.status}}
 -2. {{affirmatives.-2.status}}
+{{! is this a comment? }}
 Condition: {{>cond}}
 """
 DATA = """
