@@ -70,13 +70,13 @@ def cli(argv: Sequence[str] | None = None):
     parser.add_argument(
         '--left-delimiter',
         default='{{',
-        help="left mustache template demimiter (defaults to '{{')",
+        help="left mustache template delimiter (defaults to '{{')",
     )
 
     parser.add_argument(
         '--right-delimiter',
         default='}}',
-        help="right mustache template demimiter (defaults to '}}')",
+        help="right mustache template delimiter (defaults to '}}')",
     )
 
     args = parser.parse_args(argv)
