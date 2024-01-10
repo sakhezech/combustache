@@ -1,4 +1,5 @@
 import combustache
+import pytest
 
 
 def test_stringify():
@@ -26,4 +27,47 @@ def test_escape():
         return string.replace("'", r'\'').replace('"', r'\"')
 
     out = combustache.render(template, data, escape=escape_quotes)
+    assert out == expected
+
+
+def test_missing_data():
+    template = 'Location: {{location}}.'
+    data = {}
+    expected = 'Location: UNKNOWN.'
+
+    out = combustache.render(template, data, missing_data=lambda: 'UNKNOWN')
+    assert out == expected
+
+    def raise_if_missing():
+        raise ValueError('MISSING DATA')
+
+    with pytest.raises(ValueError):
+        out = combustache.render(template, data, missing_data=raise_if_missing)
+
+
+def test_missing_partial():
+    template = '{{>cool_partial}}'
+    data = {'part_of_partial': 321}
+    partials = {}
+    expected = '(Partial failed to load!)'
+
+    out = combustache.render(
+        template,
+        data,
+        partials,
+        missing_partial=lambda: '(Partial failed to load!)',
+    )
+    assert out == expected
+
+
+def test_missing_section():
+    template = (
+        'List of your repos:{{#repos}}\n[{{name}}](url) - {{desc}}{{/repos}}'
+    )
+    data = {'repos': []}
+    expected = 'List of your repos: none :('
+
+    out = combustache.render(
+        template, data, missing_section=lambda: ' none :('
+    )
     assert out == expected

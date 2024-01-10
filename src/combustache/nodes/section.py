@@ -89,10 +89,12 @@ class Section(Node):
         return not item
 
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
+        missing_section = opts['missing_section']
+
         data = ctx.get(self.content)
 
         if self.should_not_be_rendered(data):
-            return ''
+            return missing_section()
 
         if is_callable(data):
             unprocessed = self.template[self.inside_start : self.inside_end]

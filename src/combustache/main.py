@@ -127,6 +127,9 @@ def render(
     *,
     stringify: Callable[[Any], str] = to_str,
     escape: Callable[[str], str] = html.escape,
+    missing_data: Callable = lambda: '',
+    missing_partial: Callable = lambda: '',
+    missing_section: Callable = lambda: '',
 ) -> str:
     """
     Renders a mustache template.
@@ -148,6 +151,9 @@ def render(
     opts = {
         'stringify': stringify,
         'escape': escape,
+        'missing_data': missing_data,
+        'missing_partial': missing_partial,
+        'missing_section': missing_section,
     }
     if partials is None:
         partials = {}

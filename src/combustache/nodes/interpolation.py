@@ -20,7 +20,12 @@ class Interpolation(Node):
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
         stringify = opts['stringify']
         escape = opts['escape']
+        missing_data = opts['missing_data']
+
         data = ctx.get(self.content)
+        if data is None:
+            return missing_data()
+
         if is_callable(data):
             if data.__name__ == LAMBDA:
                 template = str(data())

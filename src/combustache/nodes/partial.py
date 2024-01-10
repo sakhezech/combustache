@@ -7,9 +7,13 @@ class Partial(Node):
     left = '>'
 
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
+        missing_partial = opts['missing_partial']
+
         partial_template = partials.get(self.content)
+
         if partial_template is None:
-            return ''
+            return missing_partial()
+
         partial_lines = partial_template.split('\n')
         if self.is_standalone:
             stack = [
