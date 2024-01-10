@@ -1,4 +1,3 @@
-import html
 from typing import Any, Callable
 
 import combustache.main
@@ -20,6 +19,7 @@ class Interpolation(Node):
 
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
         stringify = opts['stringify']
+        escape = opts['escape']
         data = ctx.get(self.content)
         if is_callable(data):
             if data.__name__ == LAMBDA:
@@ -28,7 +28,7 @@ class Interpolation(Node):
             else:
                 data = data()
 
-        string = self.get_string(data, stringify, html.escape)
+        string = self.get_string(data, stringify, escape)
         return string
 
 

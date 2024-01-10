@@ -15,3 +15,15 @@ def test_stringify():
 
     out = combustache.render(template, data, stringify=lowercase_bool)
     assert out == expected
+
+
+def test_escape():
+    template = 'I am escaping quotes: {{quotes}}'
+    data = {'quotes': '" " \' \''}
+    expected = r'I am escaping quotes: \" \" \' \''
+
+    def escape_quotes(string: str) -> str:
+        return string.replace("'", r'\'').replace('"', r'\"')
+
+    out = combustache.render(template, data, escape=escape_quotes)
+    assert out == expected

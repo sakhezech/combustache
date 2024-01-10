@@ -1,4 +1,5 @@
 import functools
+import html
 from typing import Any, Callable
 
 from combustache.ctx import Ctx
@@ -125,6 +126,7 @@ def render(
     right_delimiter: str = '}}',
     *,
     stringify: Callable[[Any], str] = to_str,
+    escape: Callable[[str], str] = html.escape,
 ) -> str:
     """
     Renders a mustache template.
@@ -145,6 +147,7 @@ def render(
     """
     opts = {
         'stringify': stringify,
+        'escape': escape,
     }
     if partials is None:
         partials = {}
