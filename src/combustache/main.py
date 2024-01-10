@@ -1,4 +1,5 @@
 import functools
+from typing import Any, Callable
 
 from combustache.ctx import Ctx
 from combustache.nodes.comment import Comment
@@ -7,7 +8,7 @@ from combustache.nodes.interpolation import Ampersand, Interpolation, Triple
 from combustache.nodes.node import Node
 from combustache.nodes.partial import Partial
 from combustache.nodes.section import Inverted, Section  # , Closing
-from combustache.util import CONTENT, construct_regex_pattern
+from combustache.util import CONTENT, construct_regex_pattern, to_str
 
 
 def create_node(
@@ -122,6 +123,8 @@ def render(
     partials: dict | None = None,
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
+    *,
+    stringify: Callable[[Any], str] = to_str,
 ) -> str:
     """
     Renders a mustache template.
@@ -140,7 +143,9 @@ def render(
         DelimiterError: Bad delimiter tag.
         ClosingTagError: No closing tag.
     """
-    opts = {}
+    opts = {
+        'stringify': stringify,
+    }
     if partials is None:
         partials = {}
     ctx = Ctx([data])

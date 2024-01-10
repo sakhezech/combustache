@@ -1,18 +1,25 @@
 import html
+from typing import Any, Callable
 
 import combustache.main
 from combustache.ctx import Ctx
 from combustache.nodes.node import Node
-from combustache.util import LAMBDA, is_callable, to_str
+from combustache.util import LAMBDA, is_callable
 
 
 class Interpolation(Node):
     standalonable = False
 
-    def process_str(self, string: str) -> str:
-        return html.escape(to_str(string))
+    def get_string(
+        self,
+        data: Any,
+        stringify: Callable[[Any], str],
+        escape: Callable[[str], str],
+    ) -> str:
+        return escape(stringify(data))
 
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
+        stringify = opts['stringify']
         data = ctx.get(self.content)
         if is_callable(data):
             if data.__name__ == LAMBDA:
@@ -21,15 +28,20 @@ class Interpolation(Node):
             else:
                 data = data()
 
-        string = self.process_str(data)
+        string = self.get_string(data, stringify, html.escape)
         return string
 
 
 class Ampersand(Interpolation):
     left = '&'
 
-    def process_str(self, string: str) -> str:
-        return to_str(string)
+    def get_string(
+        self,
+        data: Any,
+        stringify: Callable[[Any], str],
+        escape: Callable[[str], str],
+    ) -> str:
+        return stringify(data)
 
 
 class Triple(Ampersand):
