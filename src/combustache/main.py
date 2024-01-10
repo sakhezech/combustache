@@ -110,10 +110,10 @@ def _render(
     root = parse(template, 0, len(template), left_delimiter, right_delimiter)
     return ''.join(
         [
-            piece.handle(ctx, partials, opts)
-            if isinstance(piece, Node)
-            else piece
-            for piece in root
+            node.handle(ctx, partials, opts)
+            if isinstance(node, Node)
+            else node
+            for node in root
         ]
     )
 

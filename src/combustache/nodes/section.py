@@ -122,8 +122,10 @@ class Section(Node):
             ctx.append(d)
             stack.extend(
                 [
-                    i if isinstance(i, str) else i.handle(ctx, partials, opts)
-                    for i in self.inside
+                    node.handle(ctx, partials, opts)
+                    if isinstance(node, Node)
+                    else node
+                    for node in self.inside
                 ]
             )
             ctx.pop()
