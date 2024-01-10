@@ -12,12 +12,12 @@ class Interpolation(Node):
     def process_str(self, string: str) -> str:
         return html.escape(to_str(string))
 
-    def handle(self, ctx: Ctx, partials: dict) -> str:
+    def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
         data = ctx.get(self.content)
         if is_callable(data):
             if data.__name__ == LAMBDA:
                 template = str(data())
-                data = combustache.main._render(template, ctx, partials)
+                data = combustache.main._render(template, ctx, partials, opts)
             else:
                 data = data()
 

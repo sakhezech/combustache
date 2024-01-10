@@ -88,7 +88,7 @@ class Section(Node):
     def should_not_be_rendered(self, item):
         return not item
 
-    def handle(self, ctx: Ctx, partials: dict) -> str:
+    def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
         data = ctx.get(self.content)
 
         if self.should_not_be_rendered(data):
@@ -102,6 +102,7 @@ class Section(Node):
                     template,
                     ctx,
                     partials,
+                    opts,
                     self.left_delimiter,
                     self.right_delimiter,
                 )
@@ -119,7 +120,7 @@ class Section(Node):
             ctx.append(d)
             stack.extend(
                 [
-                    i if isinstance(i, str) else i.handle(ctx, partials)
+                    i if isinstance(i, str) else i.handle(ctx, partials, opts)
                     for i in self.inside
                 ]
             )

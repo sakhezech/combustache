@@ -101,13 +101,16 @@ def _render(
     template: str,
     ctx: Ctx,
     partials: dict,
+    opts: dict,
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
 ) -> str:
     root = parse(template, 0, len(template), left_delimiter, right_delimiter)
     return ''.join(
         [
-            piece.handle(ctx, partials) if isinstance(piece, Node) else piece
+            piece.handle(ctx, partials, opts)
+            if isinstance(piece, Node)
+            else piece
             for piece in root
         ]
     )
@@ -137,10 +140,13 @@ def render(
         DelimiterError: Bad delimiter tag.
         ClosingTagError: No closing tag.
     """
+    opts = {}
     if partials is None:
         partials = {}
     ctx = Ctx([data])
-    return _render(template, ctx, partials, left_delimiter, right_delimiter)
+    return _render(
+        template, ctx, partials, opts, left_delimiter, right_delimiter
+    )
 
 
 def cache_clear():

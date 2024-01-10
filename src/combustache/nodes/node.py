@@ -51,5 +51,5 @@ class Node:
             content.removeprefix(self.left).removesuffix(self.right).strip()
         )
 
-    def handle(self, ctx: Ctx, partials: dict) -> str:
+    def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
         raise NotImplementedError
