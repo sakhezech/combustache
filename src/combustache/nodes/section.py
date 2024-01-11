@@ -89,15 +89,15 @@ class Section(Node):
             self.right_delimiter,
         )
 
-    def should_not_be_rendered(self, item):
-        return not item
+    def should_be_rendered(self, item):
+        return item
 
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
         missing_section = opts['missing_section']
 
         data = ctx.get(self.content)
 
-        if self.should_not_be_rendered(data):
+        if not self.should_be_rendered(data):
             return missing_section()
 
         if is_callable(data):
@@ -139,8 +139,8 @@ class Section(Node):
 class Inverted(Section):
     left = '^'
 
-    def should_not_be_rendered(self, item):
-        return item
+    def should_be_rendered(self, item):
+        return not item
 
 
 class Closing(Node):
