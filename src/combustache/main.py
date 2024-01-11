@@ -22,7 +22,6 @@ def create_node(
     left_delimiter: str,
     right_delimiter: str,
 ) -> Node:
-    first_char, last_char = content[0], content[-1]
     kwargs = {
         'content': content,
         'tag_start': tag_start,
@@ -33,6 +32,9 @@ def create_node(
         'left_delimiter': left_delimiter,
         'right_delimiter': right_delimiter,
     }
+    if not content:
+        content = ' '
+    first_char, last_char = content[0], content[-1]
     match (first_char, last_char):
         case ('!', _):
             return Comment(**kwargs)
@@ -64,6 +66,9 @@ def find_node(
         return None
 
     left_idx = start_idx + len(left_delimiter)
+    if left_idx >= template_end:
+        return None
+
     if template[left_idx] == '{':
         new_delimiter = '}' + right_delimiter
         to_add = 1
