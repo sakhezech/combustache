@@ -1,13 +1,9 @@
-import re
-
 import combustache.main
 from combustache.ctx import Ctx
 from combustache.exceptions import ClosingTagError
 from combustache.nodes.node import Node
 from combustache.util import (
-    CONTENT,
     LAMBDA,
-    construct_regex_pattern,
     is_callable,
 )
 
@@ -36,37 +32,45 @@ class Section(Node):
             left_delimiter,
             right_delimiter,
         )
-        pattern = construct_regex_pattern(
-            self.left_delimiter,
-            self.right_delimiter,
-            f'[{re.escape(self.left)}/]',
-            '',
-        )
 
-        i = 0
-        found = None
-        for match in pattern.finditer(
-            self.template, self.end, self.template_end
-        ):
-            if match.group(CONTENT)[0] == self.left:
-                i += 1
-            else:
-                if i == 0:
-                    found = match
-                    break
-                i -= 1
-        if found is None:
-            raise ClosingTagError(
-                f'No closing tag found for {self.content} at {self.start}'
+        depth = 0
+        search_start = self.end
+        while True:
+            node_info = combustache.main.find_node(
+                template,
+                search_start,
+                template_end,
+                left_delimiter,
+                right_delimiter,
             )
+            if node_info is None:
+                tag = (
+                    f'{self.left_delimiter}{self.left}'
+                    '{self.content}{self.right}{self.right_delimiter}'
+                )
+                raise ClosingTagError(
+                    f'No closing tag found for {tag} at {self.start}.'
+                )
 
-        found_start = found.start()
-        found_end = found.end()
-        found_content = found.group(CONTENT)
+            content, start, end = node_info
+            if (
+                content[0] == self.left
+                and content.removeprefix(self.left).strip() == self.content
+            ):
+                depth += 1
+            elif (
+                content[0] == '/'
+                and content.removeprefix('/').strip() == self.content
+            ):
+                if depth == 0:
+                    break
+                depth -= 1
+            search_start = end
+
         closing_tag = Closing(
-            found_content,
-            found_start,
-            found_end,
+            content,
+            start,
+            end,
             self.template,
             self.template_start,
             self.template_end,

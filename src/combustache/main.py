@@ -9,7 +9,7 @@ from combustache.nodes.interpolation import Ampersand, Interpolation, Triple
 from combustache.nodes.node import Node
 from combustache.nodes.partial import Partial
 from combustache.nodes.section import Inverted, Section  # , Closing
-from combustache.util import CONTENT, construct_regex_pattern, to_str
+from combustache.util import to_str
 
 
 def create_node(
@@ -52,6 +52,37 @@ def create_node(
             return Interpolation(**kwargs)
 
 
+def find_node(
+    template: str,
+    search_start: int,
+    template_end: int,
+    left_delimiter: str,
+    right_delimiter: str,
+) -> tuple[str, int, int] | None:
+    start_idx = template.find(left_delimiter, search_start, template_end)
+    if start_idx < search_start:
+        return None
+
+    left_idx = start_idx + len(left_delimiter)
+    if template[left_idx] == '{':
+        new_delimiter = '}' + right_delimiter
+        to_add = 1
+    elif template[left_idx] == '=':
+        new_delimiter = '=' + right_delimiter
+        to_add = 1
+    else:
+        new_delimiter = right_delimiter
+        to_add = 0
+
+    right_idx = template.find(new_delimiter, left_idx, template_end)
+    if right_idx < left_idx:
+        return None
+
+    end_idx = right_idx + len(new_delimiter)
+    content = template[left_idx : right_idx + to_add]
+    return content, start_idx, end_idx
+
+
 @functools.cache
 def parse(
     template: str,
@@ -60,25 +91,26 @@ def parse(
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
 ) -> list[Node | str]:
-    res = []
-
-    pattern = construct_regex_pattern(left_delimiter, right_delimiter)
-    start = template_start
-    end = template_end
-
+    nodes = []
+    search_start = template_start
     while True:
-        match = pattern.search(template, start, end)
-        if match is None:
-            res.append(template[start:end])
+        node_info = find_node(
+            template,
+            search_start,
+            template_end,
+            left_delimiter,
+            right_delimiter,
+        )
+
+        if node_info is None:
+            nodes.append(template[search_start:template_end])
             break
 
-        tag_start = match.start()
-        tag_end = match.end()
-        content = match.group(CONTENT)
+        content, start, end = node_info
         node = create_node(
             content,
-            tag_start,
-            tag_end,
+            start,
+            end,
             template,
             template_start,
             template_end,
@@ -86,17 +118,15 @@ def parse(
             right_delimiter,
         )
 
-        # make this better?
         if isinstance(node, Delimiter):
             left_delimiter = node.left_delimiter
             right_delimiter = node.right_delimiter
-            pattern = construct_regex_pattern(left_delimiter, right_delimiter)
 
-        res.append(template[start : node.start])
+        nodes.append(template[search_start : node.start])
         if not node.ignorable:
-            res.append(node)
-        start = node.parse_end
-    return res
+            nodes.append(node)
+        search_start = node.parse_end
+    return nodes
 
 
 def _render(

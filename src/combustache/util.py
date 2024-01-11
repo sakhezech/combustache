@@ -1,23 +1,7 @@
-import re
 from typing import Any
 
 CONTENT = 'content'
 LAMBDA = '<lambda>'
-
-
-def construct_regex_pattern(
-    left_delimiter: str,
-    right_delimiter: str,
-    left_symbol: str = '',
-    right_symbol: str = '[}=]?',
-) -> re.Pattern:
-    # add note that left and right symbols are not escaped
-    left_delimiter = re.escape(left_delimiter)
-    right_delimiter = re.escape(right_delimiter)
-    return re.compile(
-        rf'{left_delimiter}(?P<{CONTENT}>{left_symbol}'
-        rf'[\S\s]*?{right_symbol}){right_delimiter}'
-    )
 
 
 def is_whitespace(string: str) -> bool:
