@@ -8,7 +8,7 @@ from combustache.nodes.delimiter import Delimiter
 from combustache.nodes.interpolation import Ampersand, Interpolation, Triple
 from combustache.nodes.node import Node
 from combustache.nodes.partial import Partial
-from combustache.nodes.section import Inverted, Section  # , Closing
+from combustache.nodes.section import Closing, Inverted, Section
 from combustache.util import to_str
 
 
@@ -50,6 +50,8 @@ def create_node(
             return Inverted(**kwargs)
         case ('>', _):
             return Partial(**kwargs)
+        case ('/', _):
+            return Closing(**kwargs)
         case (_, _):
             return Interpolation(**kwargs)
 
@@ -181,7 +183,8 @@ def render(
 
     Raises:
         DelimiterError: Bad delimiter tag.
-        ClosingTagError: No closing tag.
+        MissingClosingTagError: Missing closing tag.
+        StrayClosingTagError: Stray closing tag.
     """
     opts = {
         'stringify': stringify,

@@ -1,6 +1,6 @@
 import combustache.main
 from combustache.ctx import Ctx
-from combustache.exceptions import ClosingTagError
+from combustache.exceptions import MissingClosingTagError, StrayClosingTagError
 from combustache.nodes.node import Node
 from combustache.util import (
     LAMBDA,
@@ -48,7 +48,7 @@ class Section(Node):
                     f'{self.left_delimiter}{self.left}'
                     '{self.content}{self.right}{self.right_delimiter}'
                 )
-                raise ClosingTagError(
+                raise MissingClosingTagError(
                     f'No closing tag found for {tag} at {self.start}.'
                 )
 
@@ -67,7 +67,8 @@ class Section(Node):
                 depth -= 1
             search_start = end
 
-        closing_tag = Closing(
+        # not creating ClosingTag because it raises the stray tag error
+        closing_tag = Node(
             content,
             start,
             end,
@@ -146,3 +147,13 @@ class Inverted(Section):
 class Closing(Node):
     left = '/'
     ignorable = True
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        tag = (
+            f'{self.left_delimiter}{self.left}'
+            '{self.content}{self.right}{self.right_delimiter}'
+        )
+        raise StrayClosingTagError(
+            f'Stray closing tag found {tag} at {self.start}.'
+        )

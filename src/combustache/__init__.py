@@ -21,9 +21,10 @@ Typical usage as CLI: ::
     Hello world!
 """
 from combustache.exceptions import (
-    ClosingTagError,
     CombustacheError,
     DelimiterError,
+    MissingClosingTagError,
+    StrayClosingTagError,
 )
 from combustache.main import cache_clear, render
 
@@ -32,5 +33,6 @@ __all__ = [
     'cache_clear',
     'CombustacheError',
     'DelimiterError',
-    'ClosingTagError',
+    'MissingClosingTagError',
+    'StrayClosingTagError',
 ]

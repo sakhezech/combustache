@@ -6,5 +6,9 @@ class DelimiterError(CombustacheError):
     pass
 
 
-class ClosingTagError(CombustacheError):
+class MissingClosingTagError(CombustacheError):
+    pass
+
+
+class StrayClosingTagError(CombustacheError):
     pass
