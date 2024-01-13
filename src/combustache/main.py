@@ -164,9 +164,9 @@ def render(
     *,
     stringify: Callable[[Any], str] = to_str,
     escape: Callable[[str], str] = html.escape,
-    missing_data: Callable = lambda: '',
-    missing_partial: Callable = lambda: '',
-    missing_section: Callable = lambda: '',
+    missing_data: Callable[[], Any] = lambda: '',
+    missing_partial: Callable[[], Any] = lambda: '',
+    missing_section: Callable[[], Any] = lambda: '',
 ) -> str:
     """
     Renders a mustache template.
@@ -177,6 +177,13 @@ def render(
         partials (dict): Partials to use while rendering.
         left_delimiter (str): Left tag delimiter.
         right_delimiter (str): Right tag delimiter.
+
+    Keyword args:
+        stringify (Callable): String conversion function.
+        escape (Callable): Escaping function.
+        missing_data (Callable): Function called on missing data.
+        missing_partial (Callable): Function called on missing partial.
+        missing_section (Callable): Function called for not rendered sections.
 
     Returns:
         str: Rendered template.
