@@ -53,7 +53,7 @@ def cli(argv: Sequence[str] | None = None):
         '--partial',
         type=argparse.FileType(),
         action='append',
-        help='partial file (can add multiple)',
+        help='mustache partial file (can add multiple)',
     )
 
     parser.add_argument(
@@ -62,9 +62,9 @@ def cli(argv: Sequence[str] | None = None):
     )
 
     parser.add_argument(
-        '--partial-pattern',
-        default='**/*.mustache',
-        help='partial file pattern (defaults to **/*.mustache)',
+        '--partial-ext',
+        default='.mustache',
+        help="partial file extention (defaults to '.mustache')",
     )
 
     parser.add_argument(
@@ -94,13 +94,17 @@ def cli(argv: Sequence[str] | None = None):
 
     partials = {}
     for file in args.partial:
-        partials.update(json.load(file))
+        # file.name is the full name; Path(file.name).name is what we need
+        partial_name = Path(file.name).name.removesuffix(args.partial_ext)
+        partials[partial_name] = file.read()
+        file.close()
     if args.partial_dir:
         dir_path = Path(args.partial_dir)
-        partial_paths = dir_path.rglob(args.partial_pattern)
+        partial_paths = dir_path.rglob(f'**/*{args.partial_ext}')
         for path in partial_paths:
             with path.open() as file:
-                partials.update(json.load(file))
+                partial_name = path.name.removesuffix(args.partial_ext)
+                partials[partial_name] = file.read()
 
     left_delimiter = args.left_delimiter
     right_delimiter = args.right_delimiter

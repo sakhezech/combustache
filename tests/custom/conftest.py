@@ -29,23 +29,12 @@ DATA = """
   ],
   "condition": "Dead"
 }
+"""
 
-"""
-PARTIAL_1 = (
-    '{"affirmative": "'
-    '{{name}}: {{#status}}✓{{/status}}{{^status}}✗{{/status}}'
-    '"}'
-)
-PARTIAL_2 = """
-{
-  "id": "(id{{id}})"
-}
-"""
-PARTIAL_3 = """
-{
-  "cond": "> {{condition}} <"
-}
-"""
+PARTIAL_1 = '{{name}}: {{#status}}✓{{/status}}{{^status}}✗{{/status}}'
+PARTIAL_2 = '(id{{id}})'
+PARTIAL_3 = '> {{condition}} <'
+
 EXPECTED = """
 Sliver of Straw (id70) is an Iterator
 Affirmatives:
@@ -68,7 +57,7 @@ def clidir(tmp_path_factory: pytest.TempPathFactory):
 
     (tmp_path / 'template.txt').write_text(TEMPLATE)
     (tmp_path / 'data.json').write_text(DATA)
-    (tmp_path / 'partials/partial_1.json').write_text(PARTIAL_1)
-    (tmp_path / 'partials/partial_2.json').write_text(PARTIAL_2)
-    (tmp_path / 'partial_3.json').write_text(PARTIAL_3)
+    (tmp_path / 'partials/affirmative.mustache').write_text(PARTIAL_1)
+    (tmp_path / 'partials/id.mustache').write_text(PARTIAL_2)
+    (tmp_path / 'cond.mustache').write_text(PARTIAL_3)
     return tmp_path
