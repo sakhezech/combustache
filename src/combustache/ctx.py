@@ -3,7 +3,7 @@ from typing import Any
 
 from combustache.util import is_callable, is_mapping, is_sequence
 
-missing = object()
+MISSING = object()
 
 
 class Ctx(list):
@@ -13,14 +13,14 @@ class Ctx(list):
 
         chain = key.split('.')
         reverse = reversed(self)
-        found = missing
+        found = MISSING
         for item in reverse:
             found = get_inside(item, chain[0])
-            if found is not missing:
+            if found is not MISSING:
                 break
 
-        if found is missing:
-            return missing
+        if found is MISSING:
+            return MISSING
 
         for key in chain[1:]:
             found = get_inside(found, key)
@@ -31,7 +31,7 @@ def sequence_get(seq: Sequence, index: int) -> Any:
     try:
         return seq[index]
     except IndexError:
-        return missing
+        return MISSING
 
 
 def to_int(string: str) -> int | None:
@@ -46,8 +46,8 @@ def get_inside(item: Any, key: str) -> Any | None:
         item = item()
 
     if is_mapping(item):
-        return item.get(key, missing)
+        return item.get(key, MISSING)
     elif is_sequence(item) and (num := to_int(key)) is not None:
         return sequence_get(item, num)
     else:
-        return getattr(item, key, missing)
+        return getattr(item, key, MISSING)
