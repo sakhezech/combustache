@@ -11,16 +11,6 @@ def is_whitespace(string: str) -> bool:
     return not string or string.isspace()
 
 
-def is_mapping(val) -> bool:
-    # isinstance for collections.abc if too slow
-    return hasattr(val, '__getitem__') and hasattr(val, 'values')
-
-
-def is_sequence(val) -> bool:
-    # isinstance for collections.abc if too slow
-    return hasattr(val, '__getitem__') and hasattr(val, 'index')
-
-
 def is_callable(val) -> bool:
     # isinstance for collections.abc if too slow
     return hasattr(val, '__call__')
