@@ -44,6 +44,12 @@ def test_missing_data():
     with pytest.raises(ValueError):
         out = combustache.render(template, data, missing_data=raise_if_missing)
 
+    # None is not missing data
+    data = {'location': None}
+    expected = 'Location: .'
+    out = combustache.render(template, data, missing_data=lambda: 'UNKNOWN')
+    assert out == expected
+
 
 def test_missing_partial():
     template = '{{>cool_partial}}'
@@ -55,7 +61,7 @@ def test_missing_partial():
         template,
         data,
         partials,
-        missing_partial=lambda: '(Partial failed to load!)',
+        missing_data=lambda: '(Partial failed to load!)',
     )
     assert out == expected
 
@@ -65,9 +71,21 @@ def test_missing_section():
         'List of your repos:{{#repos}}\n[{{name}}](url) - {{desc}}{{/repos}}'
     )
     data = {'repos': []}
-    expected = 'List of your repos: none :('
+    expected = 'List of your repos:'
+    out = combustache.render(
+        template, data, missing_data=lambda: ' you have no repos :('
+    )
+    assert out == expected
+    data = {'repos': None}
 
     out = combustache.render(
-        template, data, missing_section=lambda: ' none :('
+        template, data, missing_data=lambda: ' you have no repos :('
+    )
+    assert out == expected
+
+    data = {}
+    expected = 'List of your repos: you have no repos :('
+    out = combustache.render(
+        template, data, missing_data=lambda: ' you have no repos :('
     )
     assert out == expected

@@ -1,7 +1,7 @@
 from typing import Any, Callable
 
 import combustache.main
-from combustache.ctx import Ctx
+from combustache.ctx import Ctx, missing
 from combustache.nodes.node import Node
 from combustache.util import LAMBDA, is_callable
 
@@ -23,7 +23,7 @@ class Interpolation(Node):
         missing_data = opts['missing_data']
 
         data = ctx.get(self.content)
-        if data is None:
+        if data is missing:
             return missing_data()
 
         if is_callable(data):

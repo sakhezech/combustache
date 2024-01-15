@@ -1,5 +1,5 @@
 import combustache.main
-from combustache.ctx import Ctx
+from combustache.ctx import Ctx, missing
 from combustache.exceptions import MissingClosingTagError, StrayClosingTagError
 from combustache.nodes.node import Node
 from combustache.util import (
@@ -91,15 +91,17 @@ class Section(Node):
         )
 
     def should_be_rendered(self, item):
-        return item
+        return item and item is not missing
 
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
-        missing_section = opts['missing_section']
+        missing_data = opts['missing_data']
 
         data = ctx.get(self.content)
 
         if not self.should_be_rendered(data):
-            return missing_section()
+            if data is missing:
+                return missing_data()
+            return ''
 
         if is_callable(data):
             unprocessed = self.template[self.inside_start : self.inside_end]
@@ -141,7 +143,7 @@ class Inverted(Section):
     left = '^'
 
     def should_be_rendered(self, item):
-        return not item
+        return not item or item is missing
 
 
 class Closing(Node):
