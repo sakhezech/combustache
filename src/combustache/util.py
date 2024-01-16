@@ -1,6 +1,5 @@
 from typing import Any
 
-CONTENT = 'content'
 LAMBDA = '<lambda>'
 
 
