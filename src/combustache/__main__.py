@@ -10,7 +10,7 @@ from combustache.main import render
 def cli(argv: Sequence[str] | None = None):
     parser = argparse.ArgumentParser(
         prog='combustache',
-        description='explosive mustache v1.3 implementation with lambdas',
+        description='an explosive mustache v1.3 implementation with lambdas',
     )
 
     parser.add_argument(

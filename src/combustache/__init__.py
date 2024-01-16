@@ -2,8 +2,8 @@
 Mustache v1.3 implementation with lambdas.
 
 Usable both in code and as CLI.
-To render a mustache template use `combustache.render`
-Processed templates are cached; to clear cache use `combustache.cache_clear`
+To render a mustache template use `combustache.render`.
+Processed templates are cached; to clear cache use `combustache.cache_clear`.
 
 Typical usage in code: ::
 
