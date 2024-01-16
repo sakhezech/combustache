@@ -11,6 +11,19 @@ from combustache.nodes.partial import Partial
 from combustache.nodes.section import Closing, Inverted, Section
 from combustache.util import to_str
 
+_nodes: set[type[Node]] = {
+    Comment,
+    Section,
+    Ampersand,
+    Inverted,
+    Closing,
+    Triple,
+    Partial,
+    Delimiter,
+}
+_node_types = {node.left: node for node in _nodes}
+_left_to_right = {node.left: node.right for node in _nodes}
+
 
 def create_node(
     content: str,
@@ -32,28 +45,16 @@ def create_node(
         'left_delimiter': left_delimiter,
         'right_delimiter': right_delimiter,
     }
+    # so we dont index into an empty string
+    # it will be stripped into an empty string anyway
     if not content:
         content = ' '
-    first_char, last_char = content[0], content[-1]
-    match (first_char, last_char):
-        case ('!', _):
-            return Comment(**kwargs)
-        case ('#', _):
-            return Section(**kwargs)
-        case ('&', _):
-            return Ampersand(**kwargs)
-        case ('{', '}'):
-            return Triple(**kwargs)
-        case ('=', '='):
-            return Delimiter(**kwargs)
-        case ('^', _):
-            return Inverted(**kwargs)
-        case ('>', _):
-            return Partial(**kwargs)
-        case ('/', _):
-            return Closing(**kwargs)
-        case (_, _):
-            return Interpolation(**kwargs)
+    # find_node function here is already dealing with the right character of
+    # Triple and Delimiter
+    node_type = _node_types.get(content[0])
+    if node_type:
+        return node_type(**kwargs)
+    return Interpolation(**kwargs)
 
 
 def find_node(
@@ -71,15 +72,9 @@ def find_node(
     if left_idx >= template_end:
         return None
 
-    if template[left_idx] == '{':
-        new_delimiter = '}' + right_delimiter
-        to_add = 1
-    elif template[left_idx] == '=':
-        new_delimiter = '=' + right_delimiter
-        to_add = 1
-    else:
-        new_delimiter = right_delimiter
-        to_add = 0
+    right = _left_to_right.get(template[left_idx], '')
+    new_delimiter = right + right_delimiter
+    to_add = len(right)
 
     right_idx = template.find(new_delimiter, left_idx, template_end)
     if right_idx < left_idx:
