@@ -2,10 +2,7 @@ import combustache.main
 from combustache.ctx import MISSING, Ctx
 from combustache.exceptions import MissingClosingTagError, StrayClosingTagError
 from combustache.nodes.node import Node
-from combustache.util import (
-    LAMBDA,
-    is_callable,
-)
+from combustache.util import LAMBDA, is_callable
 
 
 class Section(Node):
@@ -46,7 +43,7 @@ class Section(Node):
             if node_info is None:
                 tag = (
                     f'{self.left_delimiter}{self.left}'
-                    '{self.content}{self.right}{self.right_delimiter}'
+                    f'{self.content}{self.right}{self.right_delimiter}'
                 )
                 raise MissingClosingTagError(
                     f'No closing tag found for {tag} at {self.start}.'
@@ -154,7 +151,7 @@ class Closing(Node):
         super().__init__(*args, **kwargs)
         tag = (
             f'{self.left_delimiter}{self.left}'
-            '{self.content}{self.right}{self.right_delimiter}'
+            f'{self.content}{self.right}{self.right_delimiter}'
         )
         raise StrayClosingTagError(
             f'Stray closing tag found {tag} at {self.start}.'
