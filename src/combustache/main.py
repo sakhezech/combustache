@@ -51,10 +51,8 @@ def create_node(
         content = ' '
     # find_node function here is already dealing with the right character of
     # Triple and Delimiter
-    node_type = _node_types.get(content[0])
-    if node_type:
-        return node_type(**kwargs)
-    return Interpolation(**kwargs)
+    node_type = _node_types.get(content[0], Interpolation)
+    return node_type(**kwargs)
 
 
 def find_node(
