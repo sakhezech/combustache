@@ -8,6 +8,39 @@ from combustache.util import LAMBDA, is_callable
 class Section(Node):
     left = '#'
 
+    def find_closing(self):
+        depth = 0
+        search_start = self.end
+        while True:
+            node_info = combustache.main.find_node(
+                self.template,
+                search_start,
+                self.template_end,
+                self.left_delimiter,
+                self.right_delimiter,
+            )
+            if node_info is None:
+                raise MissingClosingTagError(
+                    'No closing tag found for '
+                    f'{self.presentable} at {self.start}.'
+                )
+
+            content, start, end = node_info
+            if (
+                content[0] == self.left
+                and content.removeprefix(self.left).strip() == self.content
+            ):
+                depth += 1
+            elif (
+                content[0] == '/'
+                and content.removeprefix('/').strip() == self.content
+            ):
+                if depth == 0:
+                    break
+                depth -= 1
+            search_start = end
+        return content, start, end
+
     def __init__(
         self,
         content: str,
@@ -30,37 +63,7 @@ class Section(Node):
             right_delimiter,
         )
 
-        depth = 0
-        search_start = self.end
-        while True:
-            node_info = combustache.main.find_node(
-                template,
-                search_start,
-                template_end,
-                left_delimiter,
-                right_delimiter,
-            )
-            if node_info is None:
-                raise MissingClosingTagError(
-                    'No closing tag found for '
-                    f'{self.presentable} at {self.start}.'
-                )
-
-            content, start, end = node_info
-            if (
-                content[0] == self.left
-                and content.removeprefix(self.left).strip() == self.content
-            ):
-                depth += 1
-            elif (
-                content[0] == '/'
-                and content.removeprefix('/').strip() == self.content
-            ):
-                if depth == 0:
-                    break
-                depth -= 1
-            search_start = end
-
+        content, start, end = self.find_closing()
         # not creating ClosingTag because it raises the stray tag error
         closing_tag = Node(
             content,
@@ -115,13 +118,15 @@ class Section(Node):
                 except TypeError:
                     data = data()
 
+        # if data is not a list we put it into one
+        # so we can process it easily
         if not isinstance(data, list) or not data:
             data = [data]
 
-        stack = []
-        for d in data:
-            ctx.append(d)
-            stack.extend(
+        handled = []
+        for item in data:
+            ctx.append(item)
+            handled.extend(
                 [
                     node.handle(ctx, partials, opts)
                     if isinstance(node, Node)
@@ -130,7 +135,7 @@ class Section(Node):
                 ]
             )
             ctx.pop()
-        return ''.join(stack)
+        return ''.join(handled)
 
 
 class Inverted(Section):
