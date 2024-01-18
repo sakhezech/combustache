@@ -51,5 +51,12 @@ class Node:
             content.removeprefix(self.left).removesuffix(self.right).strip()
         )
 
+    @property
+    def presentable(self) -> str:
+        return (
+            f'{self.left_delimiter}{self.left}'
+            f'{self.content}{self.right}{self.right_delimiter}'
+        )
+
     def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
         raise NotImplementedError

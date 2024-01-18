@@ -30,6 +30,9 @@ class Delimiter(Node):
         )
         split = self.content.split()
         if len(split) != 2:
-            raise DelimiterError(f'Impossible delimiter tag at {self.start}.')
+            raise DelimiterError(
+                'Impossible delimiter tag found '
+                f'{self.presentable} at {self.start}.'
+            )
         self.left_delimiter = split[0]
         self.right_delimiter = split[1]

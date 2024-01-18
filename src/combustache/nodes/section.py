@@ -41,12 +41,9 @@ class Section(Node):
                 right_delimiter,
             )
             if node_info is None:
-                tag = (
-                    f'{self.left_delimiter}{self.left}'
-                    f'{self.content}{self.right}{self.right_delimiter}'
-                )
                 raise MissingClosingTagError(
-                    f'No closing tag found for {tag} at {self.start}.'
+                    'No closing tag found for '
+                    f'{self.presentable} at {self.start}.'
                 )
 
             content, start, end = node_info
@@ -149,10 +146,6 @@ class Closing(Node):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        tag = (
-            f'{self.left_delimiter}{self.left}'
-            f'{self.content}{self.right}{self.right_delimiter}'
-        )
         raise StrayClosingTagError(
-            f'Stray closing tag found {tag} at {self.start}.'
+            f'Stray closing tag found {self.presentable} at {self.start}.'
         )
