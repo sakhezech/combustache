@@ -8,6 +8,12 @@ Processed templates are cached; to clear cache use `combustache.cache_clear`.
 
 ## Installation
 
+From [PyPI](https://pypi.org/project/combustache/):
+
+```sh
+pip install combustache
+```
+
 From git:
 
 ```sh
