@@ -1,7 +1,7 @@
 [project]
 name = 'combustache'
 readme = 'README.md'
-description = 'Mustache v1.3 implementation with lambdas.'
+description = 'Mustache v1.4 implementation with lambdas.'
 license = { file = 'LICENSE' }
 dependencies = []
 dynamic = ['version']

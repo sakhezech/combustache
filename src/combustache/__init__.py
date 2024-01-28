@@ -1,5 +1,5 @@
 """
-Mustache v1.3 implementation with lambdas.
+Mustache v1.4 implementation with lambdas.
 
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.

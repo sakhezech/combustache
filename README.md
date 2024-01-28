@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/sakhezech/combustache/actions/workflows/ci.yaml/badge.svg)](https://github.com/sakhezech/combustache/actions/workflows/ci.yaml)
 
-Mustache v1.3 implementation with lambdas.
+Mustache v1.4 implementation with lambdas.
 
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.
@@ -32,7 +32,7 @@ usage: combustache [-h] [-v] [-s] [-d DATA] [-o OUTPUT] [-p PARTIAL]
                    [--left-delimiter LEFT_DELIMITER] [--right-delimiter RIGHT_DELIMITER]
                    template
 
-an explosive mustache v1.3 implementation with lambdas
+an explosive mustache v1.4 implementation with lambdas
 
 positional arguments:
   template              mustache template file (use -s for string)
