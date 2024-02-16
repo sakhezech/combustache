@@ -151,7 +151,7 @@ def _render(
 def render(
     template: str,
     data: dict,
-    partials: dict | None = None,
+    partials: dict[str, str] | None = None,
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
     *,
@@ -163,19 +163,19 @@ def render(
     Renders a mustache template.
 
     Args:
-        template (str): Mustache template.
-        data (dict): Values to insert into the template.
-        partials (dict): Partials to insert into the template.
-        left_delimiter (str): Left tag delimiter.
-        right_delimiter (str): Right tag delimiter.
+        template: Mustache template.
+        data: Values to insert into the template.
+        partials: Partials to insert into the template.
+        left_delimiter: Left tag delimiter.
+        right_delimiter: Right tag delimiter.
 
     Keyword args:
-        stringify (Callable): String conversion function.
-        escape (Callable): Escaping function.
-        missing_data (Callable): Function called on missing data.
+        stringify: String conversion function.
+        escape: Escaping function.
+        missing_data: Function called on missing data.
 
     Returns:
-        str: Rendered template.
+        A rendered template.
 
     Raises:
         DelimiterError: Bad delimiter tag.

@@ -4,6 +4,10 @@ MISSING = object()
 
 
 class Ctx(list):
+    """
+    Context stack.
+    """
+
     def get(self, key: str) -> Any:
         if key == '.':
             return self[-1]
