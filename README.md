@@ -142,7 +142,7 @@ If you need some other way of escaping your data, you can provide a custom escap
 
 If you want to do something on a missing value, like raise an exception or insert a default value, you can do that too.
 
-Note: `None` is not missing data
+Note: `None` is not missing data.
 
 ```py
 >>> template = '{{something}}'
