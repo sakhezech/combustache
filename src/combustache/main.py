@@ -3,12 +3,18 @@ import html
 from typing import Any, Callable
 
 from combustache.ctx import Ctx
-from combustache.nodes.comment import Comment
-from combustache.nodes.delimiter import Delimiter
-from combustache.nodes.interpolation import Ampersand, Interpolation, Triple
-from combustache.nodes.node import Node
-from combustache.nodes.partial import Partial
-from combustache.nodes.section import Closing, Inverted, Section
+from combustache.nodes import (
+    Ampersand,
+    Closing,
+    Comment,
+    Delimiter,
+    Interpolation,
+    Inverted,
+    Node,
+    Partial,
+    Section,
+    Triple,
+)
 from combustache.util import Opts, to_str
 
 _nodes: set[type[Node]] = {
