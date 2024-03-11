@@ -3,7 +3,7 @@ from typing import Any, Callable
 import combustache.main
 from combustache.ctx import MISSING, Ctx
 from combustache.nodes.node import Node
-from combustache.util import LAMBDA, is_callable
+from combustache.util import LAMBDA, Opts, is_callable
 
 
 class Interpolation(Node):
@@ -17,7 +17,7 @@ class Interpolation(Node):
     ) -> str:
         return escape(stringify(data))
 
-    def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
+    def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         stringify = opts['stringify']
         escape = opts['escape']
         missing_data = opts['missing_data']

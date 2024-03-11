@@ -9,7 +9,7 @@ from combustache.nodes.interpolation import Ampersand, Interpolation, Triple
 from combustache.nodes.node import Node
 from combustache.nodes.partial import Partial
 from combustache.nodes.section import Closing, Inverted, Section
-from combustache.util import to_str
+from combustache.util import Opts, to_str
 
 _nodes: set[type[Node]] = {
     Comment,
@@ -132,8 +132,8 @@ def parse(
 def _render(
     template: str,
     ctx: Ctx,
-    partials: dict,
-    opts: dict,
+    partials: dict[str, str],
+    opts: Opts,
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
 ) -> str:
@@ -150,7 +150,7 @@ def _render(
 
 def render(
     template: str,
-    data: dict,
+    data: dict[str, Any],
     partials: dict[str, str] | None = None,
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
@@ -182,7 +182,7 @@ def render(
         MissingClosingTagError: Missing closing tag.
         StrayClosingTagError: Stray closing tag.
     """
-    opts = {
+    opts: Opts = {
         'stringify': stringify,
         'escape': escape,
         'missing_data': missing_data,

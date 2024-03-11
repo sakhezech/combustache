@@ -2,7 +2,7 @@ import combustache.main
 from combustache.ctx import MISSING, Ctx
 from combustache.exceptions import MissingClosingTagError, StrayClosingTagError
 from combustache.nodes.node import Node
-from combustache.util import LAMBDA, is_callable
+from combustache.util import LAMBDA, Opts, is_callable
 
 
 class Section(Node):
@@ -90,7 +90,7 @@ class Section(Node):
     def should_be_rendered(self, item):
         return item and item is not MISSING
 
-    def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
+    def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         missing_data = opts['missing_data']
 
         data = ctx.get(self.content)

@@ -1,5 +1,5 @@
 from combustache.ctx import Ctx
-from combustache.util import is_whitespace
+from combustache.util import Opts, is_whitespace
 
 
 class Node:
@@ -58,5 +58,5 @@ class Node:
             f'{self.content}{self.right}{self.right_delimiter}'
         )
 
-    def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
+    def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         raise NotImplementedError

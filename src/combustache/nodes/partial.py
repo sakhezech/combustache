@@ -1,12 +1,13 @@
 import combustache.main
 from combustache.ctx import Ctx
 from combustache.nodes.node import Node
+from combustache.util import Opts
 
 
 class Partial(Node):
     left = '>'
 
-    def handle(self, ctx: Ctx, partials: dict, opts: dict) -> str:
+    def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         missing_data = opts['missing_data']
 
         partial_template = partials.get(self.content)

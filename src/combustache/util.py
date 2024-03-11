@@ -1,6 +1,12 @@
-from typing import Any
+from typing import Any, Callable, TypedDict
 
 LAMBDA = '<lambda>'
+
+
+class Opts(TypedDict):
+    stringify: Callable[[Any], str]
+    escape: Callable[[str], str]
+    missing_data: Callable[[], Any]
 
 
 def is_whitespace(string: str) -> bool:
