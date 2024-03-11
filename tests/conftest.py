@@ -55,7 +55,7 @@ class SpecItem(pytest.Item):
                 f'Partials: {partials}\n'
                 f'Template: |{unescape(template)}|\n'
                 f'Expected: |{unescape(expected)}|\n'
-                f'Result: |{unescape(result)}|'
+                f'Result:   |{unescape(result)}|'
             )
             return string
         return super().repr_failure(excinfo)
