@@ -15,16 +15,10 @@ class Partial(Node):
         if partial_template is None:
             return missing_data()
 
-        partial_lines = partial_template.split('\n')
         if self.is_standalone:
-            stack = [
-                bool(line) * self.before
-                + combustache.main._render(line, ctx, partials, opts)
-                for line in partial_lines
-            ]
-        else:
-            stack = [
-                combustache.main._render(line, ctx, partials, opts)
-                for line in partial_lines
-            ]
-        return '\n'.join(stack)
+            partial_template = '\n'.join(
+                bool(line) * self.before + line
+                for line in partial_template.split('\n')
+            )
+
+        return combustache.main._render(partial_template, ctx, partials, opts)
