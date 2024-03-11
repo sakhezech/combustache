@@ -6,6 +6,9 @@ license = { file = 'LICENSE' }
 dependencies = []
 dynamic = ['version']
 
+[project.optional-dependencies]
+dev = ['ruff', 'pyyaml', 'pytest']
+
 [project.urls]
 Homepage = 'https://github.com/sakhezech/combustache'
 

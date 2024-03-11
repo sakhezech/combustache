@@ -150,3 +150,17 @@ Note: `None` is not missing data.
 >>> combustache.render(template, data, missing_data=lambda: 'NO DATA')
 'NO DATA'
 ```
+
+## Development
+
+Use `ruff check --fix .` and `ruff format .` to check and format your code.
+
+To get started:
+
+```sh
+git clone https://github.com/sakhezech/combustache
+cd combustache
+python -m venv .venv
+source .venv/bin/activate
+pip install -e '.[dev]'
+```
