@@ -8,39 +8,6 @@ from combustache.util import LAMBDA, Opts, is_callable
 class Section(Node):
     left = '#'
 
-    def find_closing(self):
-        depth = 0
-        search_start = self.end
-        while True:
-            node_info = combustache.main.find_node(
-                self.template,
-                search_start,
-                self.template_end,
-                self.left_delimiter,
-                self.right_delimiter,
-            )
-            if node_info is None:
-                raise MissingClosingTagError(
-                    'No closing tag found for '
-                    f'{self.presentable} at {self.start}.'
-                )
-
-            content, start, end = node_info
-            if (
-                content[0] == self.left
-                and content.removeprefix(self.left).strip() == self.content
-            ):
-                depth += 1
-            elif (
-                content[0] == '/'
-                and content.removeprefix('/').strip() == self.content
-            ):
-                if depth == 0:
-                    break
-                depth -= 1
-            search_start = end
-        return content, start, end
-
     def __init__(
         self,
         content: str,
@@ -62,8 +29,33 @@ class Section(Node):
             left_delimiter,
             right_delimiter,
         )
+        depth = 0
+        search_start = self.end
+        while True:
+            node_info = combustache.main.find_node(
+                self.template,
+                search_start,
+                self.template_end,
+                self.left_delimiter,
+                self.right_delimiter,
+            )
+            if node_info is None:
+                raise MissingClosingTagError(
+                    'No closing tag found for '
+                    f'{self.presentable} at {self.start}.'
+                )
 
-        content, start, end = self.find_closing()
+            node_type, content, start, end = node_info
+            if content == self.content:
+                if node_type is self.__class__:
+                    depth += 1
+                elif node_type is Closing:
+                    if depth == 0:
+                        break
+                    depth -= 1
+
+            search_start = end
+
         # not creating ClosingTag because it raises the stray tag error
         closing_tag = Node(
             content,

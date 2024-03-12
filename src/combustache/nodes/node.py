@@ -19,12 +19,13 @@ class Node:
         left_delimiter: str,
         right_delimiter: str,
     ) -> None:
+        self.content = content
         self.template = template
         self.template_start = template_start
         self.template_end = template_end
         self.left_delimiter = left_delimiter
         self.right_delimiter = right_delimiter
-        self.inside: list[str | Node] = []
+        self.inside: list[Node | str] = []
 
         # we +1 to line_start and line_end to get 'hello\n' instad of '\nhello'
         # and we get a nice side effect for end of getting 0 if we dont find \n
@@ -46,10 +47,6 @@ class Node:
             self.start = tag_start
             self.end = tag_end
         self.parse_end = self.end
-
-        self.content = (
-            content.removeprefix(self.left).removesuffix(self.right).strip()
-        )
 
     @property
     def presentable(self) -> str:

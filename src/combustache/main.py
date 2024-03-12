@@ -1,6 +1,6 @@
 import functools
 import html
-from typing import Any, Callable
+from typing import Any, Callable, Type
 
 from combustache.ctx import Ctx
 from combustache.nodes import (
@@ -28,37 +28,6 @@ _nodes: set[type[Node]] = {
     Delimiter,
 }
 _node_types = {node.left: node for node in _nodes}
-_left_to_right = {node.left: node.right for node in _nodes}
-
-
-def create_node(
-    content: str,
-    tag_start: int,
-    tag_end: int,
-    template: str,
-    template_start: int,
-    template_end: int,
-    left_delimiter: str,
-    right_delimiter: str,
-) -> Node:
-    kwargs = {
-        'content': content,
-        'tag_start': tag_start,
-        'tag_end': tag_end,
-        'template': template,
-        'template_start': template_start,
-        'template_end': template_end,
-        'left_delimiter': left_delimiter,
-        'right_delimiter': right_delimiter,
-    }
-    # so we dont index into an empty string
-    # it will be stripped into an empty string anyway
-    if not content:
-        content = ' '
-    # find_node function here is already dealing with the right character of
-    # Triple and Delimiter
-    node_type = _node_types.get(content[0], Interpolation)
-    return node_type(**kwargs)
 
 
 def find_node(
@@ -67,7 +36,7 @@ def find_node(
     template_end: int,
     left_delimiter: str,
     right_delimiter: str,
-) -> tuple[str, int, int] | None:
+) -> tuple[Type[Node], str, int, int] | None:
     start_idx = template.find(left_delimiter, search_start, template_end)
     if start_idx < search_start:
         return None
@@ -76,17 +45,18 @@ def find_node(
     if left_idx >= template_end:
         return None
 
-    right = _left_to_right.get(template[left_idx], '')
-    new_delimiter = right + right_delimiter
-    to_add = len(right)
+    node_type = _node_types.get(template[left_idx], Interpolation)
+    left = node_type.left
+    right = node_type.right
 
-    right_idx = template.find(new_delimiter, left_idx, template_end)
+    new_right_delimiter = right + right_delimiter
+    right_idx = template.find(new_right_delimiter, left_idx, template_end)
     if right_idx < left_idx:
         return None
 
-    end_idx = right_idx + len(new_delimiter)
-    content = template[left_idx : right_idx + to_add]
-    return content, start_idx, end_idx
+    end_idx = right_idx + len(new_right_delimiter)
+    content = template[left_idx + len(left) : right_idx].strip()
+    return node_type, content, start_idx, end_idx
 
 
 @functools.cache
@@ -112,8 +82,8 @@ def parse(
             nodes.append(template[search_start:template_end])
             break
 
-        content, start, end = node_info
-        node = create_node(
+        node_type, content, start, end = node_info
+        node = node_type(
             content,
             start,
             end,
