@@ -20,6 +20,7 @@ Typical usage as CLI: ::
     $ cat out.txt
     Hello world!
 """
+
 from combustache.exceptions import (
     CombustacheError,
     DelimiterError,
