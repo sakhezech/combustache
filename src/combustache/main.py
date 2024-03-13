@@ -151,7 +151,7 @@ def render(
         missing_data: Function called on missing data.
 
     Returns:
-        A rendered template.
+        Rendered template.
 
     Raises:
         DelimiterError: Bad delimiter tag.

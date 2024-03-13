@@ -7,6 +7,7 @@ Mustache v1.4 implementation with lambdas.
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.
 Processed templates are cached; to clear cache use `combustache.cache_clear`.
+To load partials from a directory use `combustache.load_partials`.
 
 ## Installation
 
@@ -26,7 +27,8 @@ pip install git+https://github.com/sakhezech/combustache
 
 `combustache ...` or `python -m combustache ...`
 
-```
+```console
+$ hashime -h
 usage: combustache [-h] [-v] [-s] [-d DATA] [-o OUTPUT] [-p PARTIAL]
                    [--partial-dir PARTIAL_DIR] [--partial-ext PARTIAL_EXT]
                    [--left-delimiter LEFT_DELIMITER] [--right-delimiter RIGHT_DELIMITER]
@@ -49,7 +51,7 @@ options:
   --partial-dir PARTIAL_DIR
                         directory with mustache partials
   --partial-ext PARTIAL_EXT
-                        partial file extention (defaults to '.mustache')
+                        partial file extension (defaults to '.mustache')
   --left-delimiter LEFT_DELIMITER
                         left mustache template delimiter (defaults to '{{')
   --right-delimiter RIGHT_DELIMITER
