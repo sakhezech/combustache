@@ -26,3 +26,10 @@ def to_str(val: Any) -> str:
     if val is None:
         return ''
     return str(val)
+
+
+def find_position(template: str, index: int) -> tuple[int, int]:
+    row = template.count('\n', 0, index)
+    last_break = template.rfind('\n', 0, index)
+    col = index - last_break - 1
+    return row + 1, col + 1

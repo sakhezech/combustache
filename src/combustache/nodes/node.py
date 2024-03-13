@@ -49,10 +49,10 @@ class Node:
         self.parse_end = self.end
 
     @property
-    def presentable(self) -> str:
+    def tag_string(self) -> str:
         return (
-            f'{self.left_delimiter}{self.left}'
-            f'{self.content}{self.right}{self.right_delimiter}'
+            f'{self.left_delimiter}{self.left} '
+            f'{self.content} {self.right}{self.right_delimiter}'
         )
 
     def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:

@@ -1,5 +1,6 @@
 from combustache.exceptions import DelimiterError
 from combustache.nodes.node import Node
+from combustache.util import find_position
 
 
 class Delimiter(Node):
@@ -30,9 +31,10 @@ class Delimiter(Node):
         )
         split = self.content.split()
         if len(split) != 2:
+            row, col = find_position(self.template, self.start)
             raise DelimiterError(
-                'Impossible delimiter tag found '
-                f'{self.presentable} at {self.start}.'
+                'Impossible delimiter tag found: '
+                f'{self.tag_string} at {row}:{col}'
             )
         self.left_delimiter = split[0]
         self.right_delimiter = split[1]
