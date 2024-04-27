@@ -60,11 +60,11 @@ def find_position(template: str, index: int) -> tuple[int, int]:
     return row + 1, col + 1
 
 
-def find_partial_files(path: Path, extension: str) -> list[Path]:
+def find_template_files(path: Path, extension: str) -> list[Path]:
     return [Path(path) for path in path.rglob(f'**/*{extension}')]
 
 
-def paths_to_partials(
+def paths_to_templates(
     partial_paths: list[Path], extension: str
 ) -> dict[str, str]:
     return {
@@ -73,17 +73,39 @@ def paths_to_partials(
     }
 
 
-def load_partials(path: StrPath, extension: str) -> dict[str, str]:
+def load_templates(path: StrPath, extension: str) -> dict[str, str]:
     """
-    Loads partials from a directory.
+    Loads templates from a directory.
+
+    Example::
+
+        my_project/
+        ├─ templates/
+        │  ├─ ui/
+        │  │  └─ comment.mustache
+        │  ├─ index.mustache
+        │  └─ other.file
+        └─ ...
+        >>> load_templates('./templates', '.mustache')
+        {
+            'comment': '<div class='comment'> {{content}} </div>',
+            'index': '<h1> Welcome, {{username}}! </h1>',
+        }
 
     Args:
         path: Root directory path.
-        extension: Partial file extension.
+        extension: Template file extension.
 
     Returns:
-        Dictionary of partials.
+        Dictionary of templates.
     """
     path = Path(path)
-    partial_paths = find_partial_files(path, extension)
-    return paths_to_partials(partial_paths, extension)
+    partial_paths = find_template_files(path, extension)
+    return paths_to_templates(partial_paths, extension)
+
+
+def load_partials(path: StrPath, extension: str) -> dict[str, str]:
+    """
+    Use `load_templates`.
+    """
+    return load_templates(path, extension)

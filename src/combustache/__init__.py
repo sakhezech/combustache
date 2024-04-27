@@ -1,9 +1,11 @@
 """
-Mustache v1.4 implementation with lambdas.
+Cached Mustache v1.4 implementation with lambdas.
 
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.
-Processed templates are cached; to clear cache use `combustache.cache_clear`.
+To clear cache use `combustache.cache_clear`.
+To load templates/partials from a directory use `combustache.load_templates`.
+To work with template objects directly use `combustache.Template`.
 
 Typical usage in code: ::
 
@@ -27,15 +29,17 @@ from combustache.exceptions import (
     MissingClosingTagError,
     StrayClosingTagError,
 )
-from combustache.main import cache_clear, render
-from combustache.util import load_partials
+from combustache.main import Template, cache_clear, render
+from combustache.util import load_partials, load_templates
 
 __all__ = [
     'render',
     'cache_clear',
+    'Template',
     'CombustacheError',
     'DelimiterError',
     'MissingClosingTagError',
     'StrayClosingTagError',
     'load_partials',
+    'load_templates',
 ]

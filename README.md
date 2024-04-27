@@ -2,12 +2,13 @@
 
 [![CI](https://github.com/sakhezech/combustache/actions/workflows/ci.yaml/badge.svg)](https://github.com/sakhezech/combustache/actions/workflows/ci.yaml)
 
-Mustache v1.4 implementation with lambdas.
+Cached Mustache v1.4 implementation with lambdas.
 
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.
-Processed templates are cached; to clear cache use `combustache.cache_clear`.
-To load partials from a directory use `combustache.load_partials`.
+To clear cache use `combustache.cache_clear`.
+To load templates/partials from a directory use `combustache.load_templates`.
+To work with template objects directly use `combustache.Template`.
 
 ## Installation
 
@@ -28,7 +29,7 @@ pip install git+https://github.com/sakhezech/combustache
 `combustache ...` or `python -m combustache ...`
 
 ```console
-$ hashime -h
+$ combustache -h
 usage: combustache [-h] [-v] [-s] [-d DATA] [-o OUTPUT] [-p PARTIAL]
                    [--partial-dir PARTIAL_DIR] [--partial-ext PARTIAL_EXT]
                    [--left-delimiter LEFT_DELIMITER] [--right-delimiter RIGHT_DELIMITER]

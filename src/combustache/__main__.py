@@ -5,7 +5,7 @@ from typing import Sequence
 
 from combustache.__version__ import __version__
 from combustache.main import render
-from combustache.util import find_partial_files, paths_to_partials
+from combustache.util import find_template_files, paths_to_templates
 
 
 def cli(argv: Sequence[str] | None = None):
@@ -95,9 +95,9 @@ def cli(argv: Sequence[str] | None = None):
         args.partial = []
 
     if args.partial_dir:
-        partial_files = find_partial_files(args.partial_dir, args.partial_ext)
+        partial_files = find_template_files(args.partial_dir, args.partial_ext)
         args.partial.extend(partial_files)
-    partials = paths_to_partials(args.partial, args.partial_ext)
+    partials = paths_to_templates(args.partial, args.partial_ext)
 
     left_delimiter = args.left_delimiter
     right_delimiter = args.right_delimiter
