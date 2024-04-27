@@ -2,7 +2,7 @@ import combustache.main
 from combustache.ctx import MISSING, Ctx
 from combustache.exceptions import MissingClosingTagError, StrayClosingTagError
 from combustache.nodes.node import Node
-from combustache.util import LAMBDA, Opts, find_position, is_callable
+from combustache.util import LAMBDA, Opts, find_position
 
 
 class Section(Node):
@@ -92,7 +92,7 @@ class Section(Node):
                 return missing_data()
             return ''
 
-        if is_callable(data):
+        if callable(data):
             unprocessed = self.template[self.inside_start : self.inside_end]
             # if the callable is a lambda we should call it with the string
             # between the tag and its closing tag and render the result

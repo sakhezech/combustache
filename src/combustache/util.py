@@ -27,10 +27,6 @@ def is_whitespace(string: str) -> bool:
     return not string or string.isspace()
 
 
-def is_callable(val: Any) -> bool:
-    return hasattr(val, '__call__')
-
-
 def to_str(val: Any) -> str:
     """
     Turns a value into a string with None -> ''.

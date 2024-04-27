@@ -3,7 +3,7 @@ from typing import Any, Callable
 import combustache.main
 from combustache.ctx import MISSING, Ctx
 from combustache.nodes.node import Node
-from combustache.util import LAMBDA, Opts, is_callable
+from combustache.util import LAMBDA, Opts
 
 
 class Interpolation(Node):
@@ -26,7 +26,7 @@ class Interpolation(Node):
         if data is MISSING:
             return missing_data()
 
-        if is_callable(data):
+        if callable(data):
             # if the callable is a lambda function we should render its result
             # in the current context
             if data.__name__ == LAMBDA:
