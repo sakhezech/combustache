@@ -17,17 +17,19 @@ from combustache.nodes import (
 )
 from combustache.util import Opts, to_str
 
-_nodes: set[type[Node]] = {
-    Comment,
-    Section,
-    Ampersand,
-    Inverted,
-    Closing,
-    Triple,
-    Partial,
-    Delimiter,
+_node_types: dict[str, type[Node]] = {
+    node.left: node
+    for node in {
+        Comment,
+        Section,
+        Ampersand,
+        Inverted,
+        Closing,
+        Triple,
+        Partial,
+        Delimiter,
+    }
 }
-_node_types = {node.left: node for node in _nodes}
 
 
 def find_node(
@@ -37,29 +39,57 @@ def find_node(
     left_delimiter: str,
     right_delimiter: str,
 ) -> tuple[Type[Node], str, int, int] | None:
-    start_idx = template.find(left_delimiter, search_start, template_end)
-    if start_idx < search_start:
+    """
+    Finds the first node from the search_start in a template.
+
+    Returns a tuple (NodeType, contents, left_outside_idx, right_outside_idx)
+    or None where:
+        NodeType: Type of the found Node.
+        contents: Inside contents of the found node.
+        left_outside_idx: Index where the node starts.
+        right_outside_idx: Index where the node ends.
+    """
+    # Hello {{> hello.world }}!
+    #       ^ ^^            ^ ^
+    #       1 23            4 5
+    # 1. left_outside_idx
+    # 2. left_char_idx
+    # 3. left_inside_idx
+    # 4. right_inside_idx
+    # 5. right_outside_idx
+    left_outside_idx = template.find(
+        left_delimiter, search_start, template_end
+    )
+    if left_outside_idx < search_start:
         return None
 
-    left_idx = start_idx + len(left_delimiter)
-    if left_idx >= template_end:
+    left_char_idx = left_outside_idx + len(left_delimiter)
+    if left_char_idx >= template_end:
         return None
 
-    node_type = _node_types.get(template[left_idx], Interpolation)
-    left = node_type.left
-    right = node_type.right
+    NodeType = _node_types.get(template[left_char_idx], Interpolation)
+    node_left_char = NodeType.left
+    node_right_char = NodeType.right
 
-    new_right_delimiter = right + right_delimiter
-    right_idx = template.find(new_right_delimiter, left_idx, template_end)
-    if right_idx < left_idx:
+    left_inside_idx = left_char_idx + len(node_left_char)
+
+    new_right_delimiter = node_right_char + right_delimiter
+    right_inside_idx = template.find(
+        new_right_delimiter, left_char_idx, template_end
+    )
+    if right_inside_idx < left_inside_idx:
         return None
 
-    end_idx = right_idx + len(new_right_delimiter)
-    content = template[left_idx + len(left) : right_idx].strip()
-    return node_type, content, start_idx, end_idx
+    right_outside_idx = right_inside_idx + len(new_right_delimiter)
+    contents = template[left_inside_idx:right_inside_idx].strip()
+    return NodeType, contents, left_outside_idx, right_outside_idx
 
 
 class Template:
+    """
+    Mustache template.
+    """
+
     def __init__(
         self,
         template: str,
@@ -68,6 +98,21 @@ class Template:
         template_start: int = 0,
         template_end: int | None = None,
     ) -> None:
+        """
+        Initializes a mustache template.
+
+        Args:
+            template: Mustache template.
+            left_delimiter: Left tag delimiter.
+            right_delimiter: Right tag delimiter.
+            template_start: Template start index.
+            template_end: Template end index.
+
+        Raises:
+            DelimiterError: Bad delimiter tag.
+            MissingClosingTagError: Missing closing tag.
+            StrayClosingTagError: Stray closing tag.
+        """
         self._list = self.parse(
             template,
             template_start,
@@ -87,7 +132,7 @@ class Template:
     ) -> list[Node | str]:
         if template_end is None:
             template_end = len(template)
-        nodes = []
+        parsed_template = []
         search_start = template_start
         while True:
             node_info = find_node(
@@ -99,12 +144,12 @@ class Template:
             )
 
             if node_info is None:
-                nodes.append(template[search_start:template_end])
+                parsed_template.append(template[search_start:template_end])
                 break
 
-            node_type, content, start, end = node_info
-            node = node_type(
-                content,
+            NodeType, contents, start, end = node_info
+            node = NodeType(
+                contents,
                 start,
                 end,
                 template,
@@ -114,15 +159,15 @@ class Template:
                 right_delimiter,
             )
 
-            if isinstance(node, Delimiter):
+            if NodeType is Delimiter:
                 left_delimiter = node.left_delimiter
                 right_delimiter = node.right_delimiter
 
-            nodes.append(template[search_start : node.start])
+            parsed_template.append(template[search_start : node.start])
             if not node.ignorable:
-                nodes.append(node)
+                parsed_template.append(node)
             search_start = node.parse_end
-        return nodes
+        return parsed_template
 
     def _render(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         return ''.join(
@@ -141,6 +186,21 @@ class Template:
         escape: Callable[[str], str] = html.escape,
         missing_data: Callable[[], Any] = lambda: '',
     ) -> str:
+        """
+        Renders a mustache template.
+
+        Args:
+            data: Values to insert into the template.
+            partials: Partials to insert into the template.
+
+        Keyword args:
+            stringify: String conversion function.
+            escape: Escaping function.
+            missing_data: Function called on missing data.
+
+        Returns:
+            Rendered template.
+        """
         opts: Opts = {
             'stringify': stringify,
             'escape': escape,

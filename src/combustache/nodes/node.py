@@ -10,7 +10,7 @@ class Node:
 
     def __init__(
         self,
-        content: str,
+        contents: str,
         tag_start: int,
         tag_end: int,
         template: str,
@@ -19,7 +19,7 @@ class Node:
         left_delimiter: str,
         right_delimiter: str,
     ) -> None:
-        self.content = content
+        self.contents = contents
         self.template = template
         self.template_start = template_start
         self.template_end = template_end
@@ -33,8 +33,11 @@ class Node:
         line_start = template.rfind('\n', 0, tag_start) + 1
         line_end = template.find('\n', tag_end) + 1 or len(template)
 
+        # string between the last linebreak and node start
         self.before = template[line_start:tag_start]
+        # string between node end and the next linebreak
         self.after = template[tag_end:line_end]
+        # these are used to check if the tag is standalone
 
         self.is_standalone = is_whitespace(self.before) and is_whitespace(
             self.after
@@ -45,13 +48,16 @@ class Node:
         else:
             self.start = tag_start
             self.end = tag_end
+        # parse_end shows the parser from where it should continue parsing
+        # tags like Section and Inverted find their closing tag and set
+        # parse_end to the end of their closing tag
         self.parse_end = self.end
 
     @property
     def tag_string(self) -> str:
         return (
             f'{self.left_delimiter}{self.left} '
-            f'{self.content} {self.right}{self.right_delimiter}'
+            f'{self.contents} {self.right}{self.right_delimiter}'
         )
 
     def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:

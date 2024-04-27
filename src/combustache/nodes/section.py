@@ -10,7 +10,7 @@ class Section(Node):
 
     def __init__(
         self,
-        content: str,
+        contents: str,
         tag_start: int,
         tag_end: int,
         template: str,
@@ -20,7 +20,7 @@ class Section(Node):
         right_delimiter: str,
     ) -> None:
         super().__init__(
-            content,
+            contents,
             tag_start,
             tag_end,
             template,
@@ -45,20 +45,20 @@ class Section(Node):
                     f'No closing tag found: {self.tag_string} at {row}:{col}'
                 )
 
-            node_type, content, start, end = node_info
-            if content == self.content:
-                if node_type is self.__class__:
+            NodeType, contents, start, end = node_info
+            if contents == self.contents:
+                if NodeType is self.__class__:
                     depth += 1
-                elif node_type is Closing:
+                elif NodeType is Closing:
                     if depth == 0:
                         break
                     depth -= 1
 
             search_start = end
 
-        # not creating ClosingTag because it raises the stray tag error
+        # not creating a ClosingTag because it raises the stray tag error
         closing_tag = Node(
-            content,
+            contents,
             start,
             end,
             self.template,
@@ -85,7 +85,7 @@ class Section(Node):
     def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         missing_data = opts['missing_data']
 
-        data = ctx.get(self.content)
+        data = ctx.get(self.contents)
 
         if not self.should_be_rendered(data):
             if data is MISSING:
@@ -94,6 +94,9 @@ class Section(Node):
 
         if is_callable(data):
             unprocessed = self.template[self.inside_start : self.inside_end]
+            # if the callable is a lambda we should call it with the string
+            # between the tag and its closing tag and render the result
+            # in the current context
             if data.__name__ == LAMBDA:
                 template = str(data(unprocessed))
                 return combustache.main._render(
@@ -105,8 +108,10 @@ class Section(Node):
                     self.right_delimiter,
                 )
             else:
+                # otherwise we should get the result with the string passed in
                 try:
                     data = data(unprocessed)
+                # or just called
                 except TypeError:
                     data = data()
 
@@ -134,6 +139,9 @@ class Closing(Node):
     left = '/'
     ignorable = True
 
+    # Section and Inverted find their closing tags themselves
+    # so if the parser tries to create a Closing tag that means that the tag
+    # was not opened to be closed
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         row, col = find_position(self.template, self.start)

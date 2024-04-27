@@ -10,7 +10,7 @@ class Delimiter(Node):
 
     def __init__(
         self,
-        content: str,
+        contents: str,
         tag_start: int,
         tag_end: int,
         template: str,
@@ -20,7 +20,7 @@ class Delimiter(Node):
         right_delimiter: str,
     ) -> None:
         super().__init__(
-            content,
+            contents,
             tag_start,
             tag_end,
             template,
@@ -29,7 +29,7 @@ class Delimiter(Node):
             left_delimiter,
             right_delimiter,
         )
-        split = self.content.split()
+        split = self.contents.split()
         if len(split) != 2:
             row, col = find_position(self.template, self.start)
             raise DelimiterError(

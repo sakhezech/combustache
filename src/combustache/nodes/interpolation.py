@@ -22,14 +22,17 @@ class Interpolation(Node):
         escape = opts['escape']
         missing_data = opts['missing_data']
 
-        data = ctx.get(self.content)
+        data = ctx.get(self.contents)
         if data is MISSING:
             return missing_data()
 
         if is_callable(data):
+            # if the callable is a lambda function we should render its result
+            # in the current context
             if data.__name__ == LAMBDA:
                 template = str(data())
                 data = combustache.main._render(template, ctx, partials, opts)
+            # otherwise we should just get the result
             else:
                 data = data()
 
