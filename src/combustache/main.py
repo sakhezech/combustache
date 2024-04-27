@@ -59,34 +59,16 @@ def find_node(
     return node_type, content, start_idx, end_idx
 
 
-@functools.cache
-def parse(
-    template: str,
-    template_start: int,
-    template_end: int,
-    left_delimiter: str = '{{',
-    right_delimiter: str = '}}',
-) -> list[Node | str]:
-    nodes = []
-    search_start = template_start
-    while True:
-        node_info = find_node(
-            template,
-            search_start,
-            template_end,
-            left_delimiter,
-            right_delimiter,
-        )
-
-        if node_info is None:
-            nodes.append(template[search_start:template_end])
-            break
-
-        node_type, content, start, end = node_info
-        node = node_type(
-            content,
-            start,
-            end,
+class Template:
+    def __init__(
+        self,
+        template: str,
+        left_delimiter: str = '{{',
+        right_delimiter: str = '}}',
+        template_start: int = 0,
+        template_end: int | None = None,
+    ) -> None:
+        self._list = self.parse(
             template,
             template_start,
             template_end,
@@ -94,15 +76,80 @@ def parse(
             right_delimiter,
         )
 
-        if isinstance(node, Delimiter):
-            left_delimiter = node.left_delimiter
-            right_delimiter = node.right_delimiter
+    @staticmethod
+    @functools.cache
+    def parse(
+        template: str,
+        template_start: int = 0,
+        template_end: int | None = None,
+        left_delimiter: str = '{{',
+        right_delimiter: str = '}}',
+    ) -> list[Node | str]:
+        if template_end is None:
+            template_end = len(template)
+        nodes = []
+        search_start = template_start
+        while True:
+            node_info = find_node(
+                template,
+                search_start,
+                template_end,
+                left_delimiter,
+                right_delimiter,
+            )
 
-        nodes.append(template[search_start : node.start])
-        if not node.ignorable:
-            nodes.append(node)
-        search_start = node.parse_end
-    return nodes
+            if node_info is None:
+                nodes.append(template[search_start:template_end])
+                break
+
+            node_type, content, start, end = node_info
+            node = node_type(
+                content,
+                start,
+                end,
+                template,
+                template_start,
+                template_end,
+                left_delimiter,
+                right_delimiter,
+            )
+
+            if isinstance(node, Delimiter):
+                left_delimiter = node.left_delimiter
+                right_delimiter = node.right_delimiter
+
+            nodes.append(template[search_start : node.start])
+            if not node.ignorable:
+                nodes.append(node)
+            search_start = node.parse_end
+        return nodes
+
+    def _render(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
+        return ''.join(
+            node.handle(ctx, partials, opts)
+            if isinstance(node, Node)
+            else node
+            for node in self._list
+        )
+
+    def render(
+        self,
+        data: dict[str, Any],
+        partials: dict[str, str] | None = None,
+        *,
+        stringify: Callable[[Any], str] = to_str,
+        escape: Callable[[str], str] = html.escape,
+        missing_data: Callable[[], Any] = lambda: '',
+    ) -> str:
+        opts: Opts = {
+            'stringify': stringify,
+            'escape': escape,
+            'missing_data': missing_data,
+        }
+        if partials is None:
+            partials = {}
+        ctx = Ctx([data])
+        return self._render(ctx, partials, opts)
 
 
 def _render(
@@ -113,15 +160,8 @@ def _render(
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
 ) -> str:
-    root = parse(template, 0, len(template), left_delimiter, right_delimiter)
-    return ''.join(
-        [
-            node.handle(ctx, partials, opts)
-            if isinstance(node, Node)
-            else node
-            for node in root
-        ]
-    )
+    root = Template(template, left_delimiter, right_delimiter)
+    return root._render(ctx, partials, opts)
 
 
 def render(
@@ -175,4 +215,4 @@ def cache_clear():
     """
     Clears cached templates.
     """
-    parse.cache_clear()
+    Template.parse.cache_clear()

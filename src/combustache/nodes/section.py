@@ -71,12 +71,12 @@ class Section(Node):
         self.inside_start = self.end
         self.inside_end = closing_tag.start
         self.parse_end = closing_tag.end
-        self.inside = combustache.main.parse(
+        self.inside = combustache.main.Template(
             self.template,
-            self.inside_start,
-            self.inside_end,
             self.left_delimiter,
             self.right_delimiter,
+            self.inside_start,
+            self.inside_end,
         )
 
     def should_be_rendered(self, item):
@@ -118,14 +118,7 @@ class Section(Node):
         handled = []
         for item in data:
             ctx.append(item)
-            handled.extend(
-                [
-                    node.handle(ctx, partials, opts)
-                    if isinstance(node, Node)
-                    else node
-                    for node in self.inside
-                ]
-            )
+            handled.append(self.inside._render(ctx, partials, opts))
             ctx.pop()
         return ''.join(handled)
 
