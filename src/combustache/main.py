@@ -113,7 +113,7 @@ class Template:
             MissingClosingTagError: Missing closing tag.
             StrayClosingTagError: Stray closing tag.
         """
-        self._list = self.parse(
+        self._list = self._parse(
             template,
             template_start,
             template_end,
@@ -123,7 +123,7 @@ class Template:
 
     @staticmethod
     @functools.cache
-    def parse(
+    def _parse(
         template: str,
         template_start: int = 0,
         template_end: int | None = None,
@@ -275,4 +275,4 @@ def cache_clear():
     """
     Clears cached templates.
     """
-    Template.parse.cache_clear()
+    Template._parse.cache_clear()
