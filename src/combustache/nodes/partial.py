@@ -10,7 +10,11 @@ class Partial(Node):
     def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         missing_data = opts['missing_data']
 
-        partial_template = partials.get(self.contents)
+        if self.contents[0] == '*':
+            partial_name = ctx.get(self.contents[1:].strip())
+            partial_template = partials.get(partial_name)
+        else:
+            partial_template = partials.get(self.contents)
 
         if partial_template is None:
             return missing_data()
