@@ -18,7 +18,11 @@ yaml.add_constructor('!code', lambda_constructor)
 
 def pytest_collect_file(parent, file_path: Path):
     if file_path.suffix == '.yml':
-        if not file_path.name.startswith('~') or file_path.stem == '~lambdas':
+        if (
+            not file_path.name.startswith('~')
+            or file_path.stem == '~lambdas'
+            or file_path.stem == '~dynamic-names'
+        ):
             return SpecFile.from_parent(parent, path=file_path)
 
 
