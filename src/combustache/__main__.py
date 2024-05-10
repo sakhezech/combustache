@@ -70,6 +70,13 @@ def cli(argv: Sequence[str] | None = None):
     )
 
     parser.add_argument(
+        '--include-relative-path',
+        action='store_true',
+        help="include template's relative path in its name"
+        ' (defaults to False)',
+    )
+
+    parser.add_argument(
         '--left-delimiter',
         default='{{',
         help="left mustache template delimiter (defaults to '{{')",
@@ -101,13 +108,12 @@ def cli(argv: Sequence[str] | None = None):
     if args.partial_dir:
         partial_files = find_template_files(args.partial_dir, args.partial_ext)
         partials_from_dir = paths_to_templates(
-            partial_files, args.partial_ext, False, args.partial_dir
+            partial_files,
+            args.partial_ext,
+            args.include_relative_path,
+            args.partial_dir,
         )
         partials.update(partials_from_dir)
-
-    # partials = paths_to_templates(
-    #     args.partial, args.partial_ext, False, args.partial_dir
-    # )
 
     left_delimiter = args.left_delimiter
     right_delimiter = args.right_delimiter
