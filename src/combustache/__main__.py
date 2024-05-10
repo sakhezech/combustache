@@ -94,10 +94,20 @@ def cli(argv: Sequence[str] | None = None):
     if args.partial is None:
         args.partial = []
 
+    partials = paths_to_templates(
+        args.partial, args.partial_ext, False, Path('.')
+    )
+
     if args.partial_dir:
         partial_files = find_template_files(args.partial_dir, args.partial_ext)
-        args.partial.extend(partial_files)
-    partials = paths_to_templates(args.partial, args.partial_ext)
+        partials_from_dir = paths_to_templates(
+            partial_files, args.partial_ext, False, args.partial_dir
+        )
+        partials.update(partials_from_dir)
+
+    # partials = paths_to_templates(
+    #     args.partial, args.partial_ext, False, args.partial_dir
+    # )
 
     left_delimiter = args.left_delimiter
     right_delimiter = args.right_delimiter

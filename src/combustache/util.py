@@ -65,15 +65,27 @@ def find_template_files(path: Path, extension: str) -> list[Path]:
 
 
 def paths_to_templates(
-    partial_paths: list[Path], extension: str
+    partial_paths: list[Path],
+    extension: str,
+    include_relative_path: bool,
+    relative_to: Path,
 ) -> dict[str, str]:
+    if include_relative_path:
+        return {
+            '.'.join(path.relative_to(relative_to).parts).removesuffix(
+                extension
+            ): path.read_text()
+            for path in partial_paths
+        }
     return {
         path.name.removesuffix(extension): path.read_text()
         for path in partial_paths
     }
 
 
-def load_templates(path: StrPath, extension: str) -> dict[str, str]:
+def load_templates(
+    path: StrPath, extension: str, *, include_relative_path: bool = False
+) -> dict[str, str]:
     """
     Loads templates from a directory.
 
@@ -86,19 +98,28 @@ def load_templates(path: StrPath, extension: str) -> dict[str, str]:
         │  ├─ index.mustache
         │  └─ other.file
         └─ ...
-        >>> load_templates('./templates', '.mustache')
+        >>> load_templates('./templates/', '.mustache')
         {
             'comment': '<div class='comment'> {{content}} </div>',
+            'index': '<h1> Welcome, {{username}}! </h1>',
+        }
+        >>> load_templates('./templates/', '.mustache',
+        ... include_relative_path=True)
+        {
+            'ui.comment': '<div class='comment'> {{content}} </div>',
             'index': '<h1> Welcome, {{username}}! </h1>',
         }
 
     Args:
         path: Root directory path.
         extension: Template file extension.
+        include_relative_path: Include template's relative path in its name.
 
     Returns:
         Dictionary of templates.
     """
     path = Path(path)
     partial_paths = find_template_files(path, extension)
-    return paths_to_templates(partial_paths, extension)
+    return paths_to_templates(
+        partial_paths, extension, include_relative_path, path
+    )
