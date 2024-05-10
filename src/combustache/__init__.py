@@ -30,7 +30,7 @@ from combustache.exceptions import (
     StrayClosingTagError,
 )
 from combustache.main import Template, cache_clear, render
-from combustache.util import load_partials, load_templates
+from combustache.util import load_templates
 
 __all__ = [
     'render',
@@ -40,6 +40,5 @@ __all__ = [
     'DelimiterError',
     'MissingClosingTagError',
     'StrayClosingTagError',
-    'load_partials',
     'load_templates',
 ]

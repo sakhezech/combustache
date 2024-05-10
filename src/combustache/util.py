@@ -102,10 +102,3 @@ def load_templates(path: StrPath, extension: str) -> dict[str, str]:
     path = Path(path)
     partial_paths = find_template_files(path, extension)
     return paths_to_templates(partial_paths, extension)
-
-
-def load_partials(path: StrPath, extension: str) -> dict[str, str]:
-    """
-    Use `load_templates`.
-    """
-    return load_templates(path, extension)
