@@ -39,6 +39,7 @@ class Node:
         self.after = template[tag_end:line_end]
         # these are used to check if the tag is standalone
 
+        self.is_pair_standalone = False
         self.is_standalone = is_whitespace(self.before) and is_whitespace(
             self.after
         )

@@ -67,6 +67,7 @@ class Section(Node):
             self.left_delimiter,
             self.right_delimiter,
         )
+        self.closing_tag = closing_tag
 
         self.inside_start = self.end
         self.inside_end = closing_tag.start

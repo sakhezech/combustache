@@ -5,12 +5,14 @@ from typing import Any, Callable, Type
 from combustache.ctx import Ctx
 from combustache.nodes import (
     Ampersand,
+    Block,
     Closing,
     Comment,
     Delimiter,
     Interpolation,
     Inverted,
     Node,
+    Parent,
     Partial,
     Section,
     Triple,
@@ -28,6 +30,8 @@ _node_types: dict[str, type[Node]] = {
         Triple,
         Partial,
         Delimiter,
+        Block,
+        Parent,
     }
 }
 

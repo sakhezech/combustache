@@ -8,6 +8,10 @@ class Ctx(list):
     Context stack.
     """
 
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.inheritance_args = {}
+
     def get(self, key: str) -> Any:
         """
         Gets a value from a context with a key.
