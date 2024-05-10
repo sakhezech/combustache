@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/sakhezech/combustache/actions/workflows/ci.yaml/badge.svg)](https://github.com/sakhezech/combustache/actions/workflows/ci.yaml)
 
-Cached Mustache v1.4 implementation with lambdas.
+Cached Mustache v1.4 implementation with all optional modules.
 
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.
@@ -24,42 +24,30 @@ From git:
 pip install git+https://github.com/sakhezech/combustache
 ```
 
-## Usage as CLI
-
-`combustache ...` or `python -m combustache ...`
-
-```console
-$ combustache -h
-usage: combustache [-h] [-v] [-s] [-d DATA] [-o OUTPUT] [-p PARTIAL]
-                   [--partial-dir PARTIAL_DIR] [--partial-ext PARTIAL_EXT]
-                   [--left-delimiter LEFT_DELIMITER] [--right-delimiter RIGHT_DELIMITER]
-                   template
-
-an explosive mustache v1.4 implementation with lambdas
-
-positional arguments:
-  template              mustache template file (use -s for string)
-
-options:
-  -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
-  -s, --string          pass in a string instead of a file for template
-  -d DATA, --data DATA  data json file (defaults to stdin)
-  -o OUTPUT, --output OUTPUT
-                        output file (defaults to stdout)
-  -p PARTIAL, --partial PARTIAL
-                        mustache partial file (can add multiple)
-  --partial-dir PARTIAL_DIR
-                        directory with mustache partials
-  --partial-ext PARTIAL_EXT
-                        partial file extension (defaults to '.mustache')
-  --left-delimiter LEFT_DELIMITER
-                        left mustache template delimiter (defaults to '{{')
-  --right-delimiter RIGHT_DELIMITER
-                        right mustache template delimiter (defaults to '}}')
-```
-
 ## Usage in code
+
+### Loading templates/partials
+
+```py
+>>> # my_project/
+>>> # ├─ templates/
+>>> # │  ├─ ui/
+>>> # │  │  └─ comment.mustache
+>>> # │  ├─ index.mustache
+>>> # │  └─ other.file
+>>> # └─ ...
+>>> combustache.load_templates('./templates/', '.mustache')
+{
+    'comment': "<div class='comment'> {{content}} </div>",
+    'index': '<h1> Welcome, {{username}}! </h1>',
+}
+>>> combustache.load_templates('./templates/', '.mustache',
+... include_relative_path=True)
+{
+    'ui.comment': "<div class='comment'> {{content}} </div>",
+    'index': '<h1> Welcome, {{username}}! </h1>',
+}
+```
 
 ### Basic
 
@@ -93,9 +81,38 @@ You can specify the delimiters outside the template.
 'My name is Anahit.'
 ```
 
+### Lambda support
+
+```py
+>>> template = 'Hello, {{labmda}}!'
+>>> data = {'planet': 'world', 'labmda': lambda: '{{planet}}'}
+>>> combustache.render(template, data)
+'Hello, world!'
+```
+
+### Dynamic partials support
+
+```py
+>>> template = '{{>*dynamic}}'
+>>> data = {'dynamic': 'content'}
+>>> partials = {'content': 'something'}
+>>> combustache.render(template, data, partials)
+'something'
+```
+
+### Inheritance support
+
+```py
+>>> template = '{{< div}}{{$content}}hello :){{/content}}{{/ div}}'
+>>> data = {}
+>>> partials = {'div': '<div>{{$content}}default{{/content}}</div>'}
+>>> combustache.render(template, data, partials)
+'<div>hello :)</div>'
+```
+
 ### List indexing
 
-You can index into lists by dotting into them with a number. Both positive and negative numbers work.
+You can index into lists by dotting into them with a number.
 
 ```py
 >>> data = {'items': ['Apricot', 'Cherry', 'Pomegranate']}
@@ -152,6 +169,45 @@ Note: `None` is not missing data.
 >>> data = {}
 >>> combustache.render(template, data, missing_data=lambda: 'NO DATA')
 'NO DATA'
+```
+
+## Usage as CLI
+
+`combustache ...` or `python -m combustache ...`
+
+```console
+$ combustache -h
+usage: combustache [-h] [-v] [-s] [-d DATA] [-o OUTPUT] [-p PARTIAL]
+                   [--partial-dir PARTIAL_DIR] [--partial-ext PARTIAL_EXT]
+                   [--include-relative-path] [--left-delimiter LEFT_DELIMITER]
+                   [--right-delimiter RIGHT_DELIMITER]
+                   template
+
+an explosive mustache v1.4 implementation with all optional modules
+
+positional arguments:
+  template              mustache template file (use -s for string)
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  -s, --string          pass in a string instead of a file for template
+  -d DATA, --data DATA  data json file (defaults to stdin)
+  -o OUTPUT, --output OUTPUT
+                        output file (defaults to stdout)
+  -p PARTIAL, --partial PARTIAL
+                        mustache partial file (can add multiple)
+  --partial-dir PARTIAL_DIR
+                        directory with mustache partials
+  --partial-ext PARTIAL_EXT
+                        partial file extension (defaults to '.mustache')
+  --include-relative-path
+                        include template's relative path in its name (defaults
+                        to False)
+  --left-delimiter LEFT_DELIMITER
+                        left mustache template delimiter (defaults to '{{')
+  --right-delimiter RIGHT_DELIMITER
+                        right mustache template delimiter (defaults to '}}')
 ```
 
 ## Development
