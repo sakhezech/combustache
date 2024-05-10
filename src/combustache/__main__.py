@@ -11,7 +11,8 @@ from combustache.util import find_template_files, paths_to_templates
 def cli(argv: Sequence[str] | None = None):
     parser = argparse.ArgumentParser(
         prog='combustache',
-        description='an explosive mustache v1.4 implementation with lambdas',
+        description='an explosive mustache v1.4 implementation with all'
+        ' optional modules',
     )
 
     parser.add_argument(

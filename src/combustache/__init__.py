@@ -1,5 +1,5 @@
 """
-Cached Mustache v1.4 implementation with lambdas.
+Cached Mustache v1.4 implementation with all optional modules.
 
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.
