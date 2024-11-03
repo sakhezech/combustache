@@ -61,7 +61,7 @@ def find_position(template: str, index: int) -> tuple[int, int]:
 
 
 def find_template_files(path: Path, extension: str) -> list[Path]:
-    return [Path(path) for path in path.rglob(f'**/*{extension}')]
+    return list(path.rglob(f'**/*{extension}'))
 
 
 def paths_to_templates(
