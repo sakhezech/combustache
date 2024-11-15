@@ -1,5 +1,6 @@
-import combustache
 import pytest
+
+import combustache
 
 
 def test_stringify():

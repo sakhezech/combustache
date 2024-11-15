@@ -2,8 +2,9 @@ import os
 import subprocess
 from pathlib import Path
 
-from combustache.__main__ import cli
 from conftest import EXPECTED, TEMPLATE
+
+from combustache.__main__ import cli
 
 
 def test_partial_list(clidir: Path):
