@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: true
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: Install dependencies
@@ -23,7 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install '.[dev]'
-      - name: Running tests
+      - name: Run tests
         run: |
           pytest .
 
@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: Install dependencies
@@ -41,9 +41,9 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install '.[dev]'
-      - name: Analysing formatting
+      - name: Run formatter
         run: |
           ruff format --check .
-      - name: Analysing code
+      - name: Run linter
         run: |
           ruff check .
