@@ -3,14 +3,20 @@ from typing import Any
 MISSING = object()
 
 
-class Ctx(list):
+class Ctx:
     """
     Context stack.
     """
 
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, stack: list[Any]):
+        self.stack = stack
         self.inheritance_args = {}
+
+    def pop(self, index: int = -1) -> Any:
+        return self.stack.pop(index)
+
+    def append(self, value: Any) -> None:
+        return self.stack.append(value)
 
     def get(self, key: str) -> Any:
         """
@@ -25,7 +31,7 @@ class Ctx(list):
             Value or MISSING.
         """
         if key == '.':
-            return self[-1]
+            return self.stack[-1]
 
         chain = key.split('.')
 
@@ -38,7 +44,7 @@ class Ctx(list):
         return found
 
     def find_first(self, key: str):
-        rctx = reversed(self)
+        rctx = reversed(self.stack)
         for item in rctx:
             found = self.deep_get(item, key)
             if found is not MISSING:
