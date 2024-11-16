@@ -2,8 +2,8 @@ import functools
 import html
 from typing import Any, Callable, Type
 
-from combustache.ctx import Ctx
-from combustache.nodes import (
+from .ctx import Ctx
+from .nodes import (
     Ampersand,
     Block,
     Closing,
@@ -17,7 +17,7 @@ from combustache.nodes import (
     Section,
     Triple,
 )
-from combustache.util import Opts, to_str
+from .util import Opts, to_str
 
 _node_types: dict[str, type[Node]] = {
     node.left: node

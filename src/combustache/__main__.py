@@ -3,9 +3,9 @@ import json
 from pathlib import Path
 from typing import Sequence
 
-from combustache.__version__ import __version__
-from combustache.main import render
-from combustache.util import find_template_files, paths_to_templates
+from .__version__ import __version__
+from .main import render
+from .util import find_template_files, paths_to_templates
 
 
 def cli(argv: Sequence[str] | None = None):

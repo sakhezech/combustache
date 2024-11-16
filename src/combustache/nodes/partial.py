@@ -1,7 +1,7 @@
-import combustache.main
-from combustache.ctx import Ctx
-from combustache.nodes.node import Node
-from combustache.util import Opts
+from .. import main
+from ..ctx import Ctx
+from ..util import Opts
+from .node import Node
 
 
 class Partial(Node):
@@ -25,4 +25,4 @@ class Partial(Node):
                 for line in partial_template.split('\n')
             )
 
-        return combustache.main._render(partial_template, ctx, partials, opts)
+        return main._render(partial_template, ctx, partials, opts)

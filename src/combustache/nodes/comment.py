@@ -1,4 +1,4 @@
-from combustache.nodes.node import Node
+from .node import Node
 
 
 class Comment(Node):

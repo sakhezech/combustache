@@ -1,5 +1,5 @@
-from combustache.ctx import Ctx
-from combustache.util import Opts, is_whitespace
+from ..ctx import Ctx
+from ..util import Opts, is_whitespace
 
 
 class Node:

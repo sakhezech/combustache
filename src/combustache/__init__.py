@@ -23,14 +23,14 @@ Typical usage as CLI: ::
     Hello world!
 """
 
-from combustache.exceptions import (
+from .exceptions import (
     CombustacheError,
     DelimiterError,
     MissingClosingTagError,
     StrayClosingTagError,
 )
-from combustache.main import Template, cache_clear, render
-from combustache.util import load_templates
+from .main import Template, cache_clear, render
+from .util import load_templates
 
 __all__ = [
     'render',

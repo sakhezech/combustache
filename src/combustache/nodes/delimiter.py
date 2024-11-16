@@ -1,6 +1,6 @@
-from combustache.exceptions import DelimiterError
-from combustache.nodes.node import Node
-from combustache.util import find_position
+from ..exceptions import DelimiterError
+from ..util import find_position
+from .node import Node
 
 
 class Delimiter(Node):

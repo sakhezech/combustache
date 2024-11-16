@@ -1,8 +1,8 @@
-import combustache.main
-from combustache.ctx import MISSING, Ctx
-from combustache.exceptions import MissingClosingTagError, StrayClosingTagError
-from combustache.nodes.node import Node
-from combustache.util import LAMBDA, Opts, find_position
+from .. import main
+from ..ctx import MISSING, Ctx
+from ..exceptions import MissingClosingTagError, StrayClosingTagError
+from ..util import LAMBDA, Opts, find_position
+from .node import Node
 
 
 class Section(Node):
@@ -32,7 +32,7 @@ class Section(Node):
         depth = 0
         search_start = self.end
         while True:
-            node_info = combustache.main.find_node(
+            node_info = main.find_node(
                 self.template,
                 search_start,
                 self.template_end,
@@ -72,7 +72,7 @@ class Section(Node):
         self.inside_start = self.end
         self.inside_end = closing_tag.start
         self.parse_end = closing_tag.end
-        self.inside = combustache.main.Template(
+        self.inside = main.Template(
             self.template,
             self.left_delimiter,
             self.right_delimiter,
@@ -100,7 +100,7 @@ class Section(Node):
             # in the current context
             if data.__name__ == LAMBDA:
                 template = str(data(unprocessed))
-                return combustache.main._render(
+                return main._render(
                     template,
                     ctx,
                     partials,

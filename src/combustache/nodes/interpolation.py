@@ -1,9 +1,9 @@
 from typing import Any, Callable
 
-import combustache.main
-from combustache.ctx import MISSING, Ctx
-from combustache.nodes.node import Node
-from combustache.util import LAMBDA, Opts
+from .. import main
+from ..ctx import MISSING, Ctx
+from ..util import LAMBDA, Opts
+from .node import Node
 
 
 class Interpolation(Node):
@@ -31,7 +31,7 @@ class Interpolation(Node):
             # in the current context
             if data.__name__ == LAMBDA:
                 template = str(data())
-                data = combustache.main._render(template, ctx, partials, opts)
+                data = main._render(template, ctx, partials, opts)
             # otherwise we should just get the result
             else:
                 data = data()

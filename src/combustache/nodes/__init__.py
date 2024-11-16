@@ -1,10 +1,10 @@
-from combustache.nodes.comment import Comment
-from combustache.nodes.delimiter import Delimiter
-from combustache.nodes.inheritance import Block, Parent
-from combustache.nodes.interpolation import Ampersand, Interpolation, Triple
-from combustache.nodes.node import Node
-from combustache.nodes.partial import Partial
-from combustache.nodes.section import Closing, Inverted, Section
+from .comment import Comment
+from .delimiter import Delimiter
+from .inheritance import Block, Parent
+from .interpolation import Ampersand, Interpolation, Triple
+from .node import Node
+from .partial import Partial
+from .section import Closing, Inverted, Section
 
 __all__ = [
     'Comment',

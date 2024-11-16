@@ -1,10 +1,10 @@
 import textwrap
 
-import combustache.main
-from combustache.ctx import MISSING, Ctx
-from combustache.nodes.node import Node
-from combustache.nodes.section import Section
-from combustache.util import Opts, is_whitespace
+from .. import main
+from ..ctx import MISSING, Ctx
+from ..util import Opts, is_whitespace
+from .node import Node
+from .section import Section
 
 
 def pair_if_pair_standalone(first: Node, second: Node) -> None:
@@ -86,7 +86,7 @@ class Block(Section):
             partial_template = textwrap.indent(
                 partial_template, self.indent or self.before
             )
-        return combustache.main._render(partial_template, ctx, partials, opts)
+        return main._render(partial_template, ctx, partials, opts)
 
 
 class Parent(Section):
@@ -153,6 +153,6 @@ class Parent(Section):
         if self.is_standalone or self.is_pair_standalone:
             partial_template = textwrap.indent(partial_template, self.before)
 
-        res = combustache.main._render(partial_template, ctx, partials, opts)
+        res = main._render(partial_template, ctx, partials, opts)
         ctx.inheritance_args.clear()
         return res
