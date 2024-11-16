@@ -29,12 +29,11 @@ from .exceptions import (
     MissingClosingTagError,
     StrayClosingTagError,
 )
-from .main import Template, cache_clear, render
+from .main import Template, render
 from .util import load_templates
 
 __all__ = [
     'render',
-    'cache_clear',
     'Template',
     'CombustacheError',
     'DelimiterError',

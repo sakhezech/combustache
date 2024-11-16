@@ -1,4 +1,3 @@
-import functools
 import html
 from typing import Any, Callable, Type
 
@@ -117,23 +116,6 @@ class Template:
             MissingClosingTagError: Missing closing tag.
             StrayClosingTagError: Stray closing tag.
         """
-        self._list = self._parse(
-            template,
-            template_start,
-            template_end,
-            left_delimiter,
-            right_delimiter,
-        )
-
-    @staticmethod
-    @functools.cache
-    def _parse(
-        template: str,
-        template_start: int = 0,
-        template_end: int | None = None,
-        left_delimiter: str = '{{',
-        right_delimiter: str = '}}',
-    ) -> list[Node | str]:
         if template_end is None:
             template_end = len(template)
         parsed_template = []
@@ -171,7 +153,8 @@ class Template:
             if not node.ignorable:
                 parsed_template.append(node)
             search_start = node.parse_end
-        return parsed_template
+
+        self._list: list[Node | str] = parsed_template
 
     def _render(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         return ''.join(
@@ -273,10 +256,3 @@ def render(
     return _render(
         template, ctx, partials, opts, left_delimiter, right_delimiter
     )
-
-
-def cache_clear():
-    """
-    Clears cached templates.
-    """
-    Template._parse.cache_clear()
