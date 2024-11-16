@@ -1,9 +1,8 @@
 """
-Cached Mustache v1.4 implementation with all optional modules.
+Mustache v1.4 implementation with all optional modules.
 
 Usable both in code and as CLI.
 To render a mustache template use `combustache.render`.
-To clear cache use `combustache.cache_clear`.
 To load templates/partials from a directory use `combustache.load_templates`.
 To work with template objects directly use `combustache.Template`.
 
