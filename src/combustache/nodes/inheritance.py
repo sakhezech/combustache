@@ -7,18 +7,12 @@ from .node import Node
 from .section import Section
 
 
-def pair_if_pair_standalone(first: Node, second: Node) -> None:
-    if (
-        is_whitespace(first.before)
-        and is_whitespace(second.after)
-        and first.end == second.start
-    ):
-        for node in (first, second):
-            node.start = node.template.rfind('\n', 0, node.start) + 1
-            node.end = node.template.find('\n', node.end) + 1 or len(
-                node.template
-            )
-            node.is_pair_standalone = True
+def is_paired(node1: Node, node2: Node) -> bool:
+    return (
+        is_whitespace(node1.before)
+        and is_whitespace(node2.after)
+        and node1.tag_end == node2.tag_start
+    )
 
 
 class Block(Section):
@@ -45,33 +39,31 @@ class Block(Section):
             left_delimiter,
             right_delimiter,
         )
-        pair_if_pair_standalone(self, self.closing_tag)
-        self.init()
+        if is_paired(self, self.closing_tag):
+            self.is_standalone = True
+            self.actual_start = self.line_start
+            self.closing_tag.actual_end = self.closing_tag.line_end
+            # standalone blocks are unique
+            # https://github.com/mustache/spec/pull/131#discussion_r668359813
+            #    if the end section tag is not standalone by itself, then
+            #    the trailing newline will not be removed from the output
+            #    if the block ends up being empty
+            self.closing_tag.actual_end -= 1
 
-    def init(self):
-        text = self.template[self.inside_start : self.inside_end]
+        self.set_indentation_and_default_value()
 
-        # standalone blocks are unique
-        # https://github.com/mustache/spec/pull/131#discussion_r668359813
-        #    if the end section tag is not standalone by itself, then
-        #    the trailing newline will not be removed from the output
-        #    if the block ends up being empty
-        if (
-            not self.closing_tag.is_standalone
-            and self.closing_tag.is_pair_standalone
-            and not text
-        ):
-            self.end -= 1
-            self.parse_end = self.end
+    def set_indentation_and_default_value(self):
+        text = self.inside_text
 
-        if self.is_standalone or self.is_pair_standalone:
+        if self.is_standalone:
             dedented_text = textwrap.dedent(text)
             dedented_line = dedented_text.split('\n')[0]
             full_line = text.split('\n')[0]
-            self.indent = full_line.removesuffix(dedented_line)
 
+            self.indent = full_line.removesuffix(dedented_line)
             self.default_value = dedented_text
         else:
+            self.indent = None
             self.default_value = text
 
     def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
@@ -82,7 +74,7 @@ class Block(Section):
         else:
             partial_template = data
 
-        if self.is_standalone or self.is_pair_standalone:
+        if self.is_standalone:
             partial_template = textwrap.indent(
                 partial_template, self.indent or self.before
             )
@@ -113,28 +105,31 @@ class Parent(Section):
             left_delimiter,
             right_delimiter,
         )
-        pair_if_pair_standalone(self, self.closing_tag)
-        self.parse_end = self.closing_tag.end
-
+        if is_paired(self, self.closing_tag):
+            self.is_standalone = True
+            self.actual_start = self.line_start
+            self.closing_tag.actual_end = self.closing_tag.line_end
         self.blocks = [v for v in self.inside._list if isinstance(v, Block)]
 
         if self.blocks:
             # {{< parent}}{{$ block}} are pair standalone
             first_block = self.blocks[0]
-            pair_if_pair_standalone(self, first_block)
-            first_block.inside_start = first_block.end
-            # we dont need to set inside_end
-            # the only things that change here are parent opening tag and
-            # block opening tag, i.e. block closing tag is not affected
+            if is_paired(self, first_block):
+                self.is_standalone = True
+                first_block.is_standalone = True
+
+                self.practical_start = self.line_start
+                first_block.actual_end = first_block.line_end
+                first_block.set_indentation_and_default_value()
 
             # {{/ parent}}{{/ block}} are pair standalone
             last_block = self.blocks[-1]
-            pair_if_pair_standalone(last_block.closing_tag, self.closing_tag)
-            self.parse_end = self.closing_tag.end
-
-            # we possibly standaloned these tags
-            first_block.init()
-            last_block.init()
+            if is_paired(last_block.closing_tag, self.closing_tag):
+                last_block.closing_tag.actual_start = (
+                    last_block.closing_tag.line_start
+                )
+                self.closing_tag.actual_end = self.closing_tag.line_end
+                last_block.set_indentation_and_default_value()
 
     def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         missing_data = opts['missing_data']
