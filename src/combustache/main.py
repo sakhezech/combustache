@@ -186,9 +186,9 @@ class Template:
         data: dict[str, Any],
         partials: dict[str, str] | None = None,
         *,
-        stringify: Callable[[Any], str] = to_str,
-        escape: Callable[[str], str] = html.escape,
-        missing_data: Callable[[], Any] = lambda: '',
+        stringify: Callable[[Any], str] | None = None,
+        escape: Callable[[str], str] | None = None,
+        missing_data: Callable[[], Any] | None = None,
     ) -> str:
         """
         Renders a mustache template.
@@ -206,9 +206,9 @@ class Template:
             Rendered template.
         """
         opts: Opts = {
-            'stringify': stringify,
-            'escape': escape,
-            'missing_data': missing_data,
+            'stringify': stringify or to_str,
+            'escape': escape or html.escape,
+            'missing_data': missing_data or (lambda: ''),
         }
         if partials is None:
             partials = {}
@@ -235,9 +235,9 @@ def render(
     left_delimiter: str = '{{',
     right_delimiter: str = '}}',
     *,
-    stringify: Callable[[Any], str] = to_str,
-    escape: Callable[[str], str] = html.escape,
-    missing_data: Callable[[], Any] = lambda: '',
+    stringify: Callable[[Any], str] | None = None,
+    escape: Callable[[str], str] | None = None,
+    missing_data: Callable[[], Any] | None = None,
 ) -> str:
     """
     Renders a mustache template.
@@ -263,9 +263,9 @@ def render(
         StrayClosingTagError: Stray closing tag.
     """
     opts: Opts = {
-        'stringify': stringify,
-        'escape': escape,
-        'missing_data': missing_data,
+        'stringify': stringify or to_str,
+        'escape': escape or html.escape,
+        'missing_data': missing_data or (lambda: ''),
     }
     if partials is None:
         partials = {}
