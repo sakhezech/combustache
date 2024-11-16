@@ -167,7 +167,7 @@ class Template:
                 left_delimiter = node.left_delimiter
                 right_delimiter = node.right_delimiter
 
-            parsed_template.append(template[search_start : node.start])
+            parsed_template.append(template[search_start : node.actual_start])
             if not node.ignorable:
                 parsed_template.append(node)
             search_start = node.parse_end

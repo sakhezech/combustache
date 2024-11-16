@@ -30,13 +30,16 @@ class Node:
         # and we get a nice side effect for end of getting 0 if we dont find \n
         # (i.e. we hit end of string) because str.find returns -1 in that case
         # so we can 'or len(template)' our value to get the end of the template
-        line_start = template.rfind('\n', 0, tag_start) + 1
-        line_end = template.find('\n', tag_end) + 1 or len(template)
+        self.line_start = template.rfind('\n', 0, tag_start) + 1
+        self.line_end = template.find('\n', tag_end) + 1 or len(template)
+
+        self.tag_start = tag_start
+        self.tag_end = tag_end
 
         # string between the last linebreak and node start
-        self.before = template[line_start:tag_start]
+        self.before = template[self.line_start : self.tag_start]
         # string between node end and the next linebreak
-        self.after = template[tag_end:line_end]
+        self.after = template[self.tag_end : self.line_end]
         # these are used to check if the tag is standalone
 
         self.is_pair_standalone = False
@@ -44,15 +47,18 @@ class Node:
             self.after
         )
         if self.standalonable and self.is_standalone:
-            self.start = line_start
-            self.end = line_end
+            self.actual_start = self.line_start
+            self.actual_end = self.line_end
         else:
-            self.start = tag_start
-            self.end = tag_end
+            self.actual_start = self.tag_start
+            self.actual_end = self.tag_end
+
+    @property
+    def parse_end(self) -> int:
         # parse_end shows the parser from where it should continue parsing
         # tags like Section and Inverted find their closing tag and set
         # parse_end to the end of their closing tag
-        self.parse_end = self.end
+        return self.actual_end
 
     @property
     def tag_string(self) -> str:

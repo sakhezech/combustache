@@ -31,7 +31,7 @@ class Delimiter(Node):
         )
         split = self.contents.split()
         if len(split) != 2:
-            row, col = find_position(self.template, self.start)
+            row, col = find_position(self.template, self.tag_start)
             raise DelimiterError(
                 'Impossible delimiter tag found: '
                 f'{self.tag_string} at {row}:{col}'

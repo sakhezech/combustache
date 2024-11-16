@@ -30,7 +30,7 @@ class Section(Node):
             right_delimiter,
         )
         depth = 0
-        search_start = self.end
+        search_start = self.actual_end
         while True:
             node_info = main.find_node(
                 self.template,
@@ -40,7 +40,7 @@ class Section(Node):
                 self.right_delimiter,
             )
             if node_info is None:
-                row, col = find_position(self.template, self.start)
+                row, col = find_position(self.template, self.tag_start)
                 raise MissingClosingTagError(
                     f'No closing tag found: {self.tag_string} at {row}:{col}'
                 )
@@ -69,16 +69,21 @@ class Section(Node):
         )
         self.closing_tag = closing_tag
 
-        self.inside_start = self.end
-        self.inside_end = closing_tag.start
-        self.parse_end = closing_tag.end
         self.inside = main.Template(
             self.template,
             self.left_delimiter,
             self.right_delimiter,
-            self.inside_start,
-            self.inside_end,
+            self.actual_end,
+            self.closing_tag.actual_start,
         )
+
+    @property
+    def parse_end(self) -> int:
+        return self.closing_tag.actual_end
+
+    @property
+    def inside_text(self) -> str:
+        return self.template[self.actual_end : self.closing_tag.actual_start]
 
     def should_be_rendered(self, item):
         return item and item is not MISSING
@@ -94,7 +99,7 @@ class Section(Node):
             return ''
 
         if callable(data):
-            unprocessed = self.template[self.inside_start : self.inside_end]
+            unprocessed = self.inside_text
             # if the callable is a lambda we should call it with the string
             # between the tag and its closing tag and render the result
             # in the current context
@@ -145,7 +150,7 @@ class Closing(Node):
     # was not opened to be closed
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        row, col = find_position(self.template, self.start)
+        row, col = find_position(self.template, self.tag_start)
         raise StrayClosingTagError(
             f'Stray closing tag found: {self.tag_string} at {row}:{col}'
         )
