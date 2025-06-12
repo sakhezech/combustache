@@ -88,7 +88,11 @@ class Section(Node):
         return self.template[self.actual_end : self.closing_tag.actual_start]
 
     def should_be_rendered(self, item):
-        return item and item is not MISSING
+        return (
+            item
+            and item is not MISSING
+            and (not isinstance(item, Iterable) or len(list(item)))
+        )
 
     def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
         missing_data = opts['missing_data']
@@ -125,7 +129,7 @@ class Section(Node):
 
         # if data is not an iterable we put it into a list
         # so we can process it easily
-        if not data or not (
+        if not (
             isinstance(data, Iterable)
             and not isinstance(data, str | bytes | Mapping)
         ):
@@ -143,7 +147,19 @@ class Inverted(Section):
     left = '^'
 
     def should_be_rendered(self, item):
-        return not item or item is MISSING
+        return not super().should_be_rendered(item)
+
+    def handle(self, ctx: Ctx, partials: dict[str, str], opts: Opts) -> str:
+        missing_data = opts['missing_data']
+
+        data = ctx.get(self.contents)
+
+        if not self.should_be_rendered(data):
+            if data is MISSING:
+                return missing_data()
+            return ''
+
+        return self.inside._render(ctx, partials, opts)
 
 
 class Closing(Node):
