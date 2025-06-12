@@ -1,3 +1,5 @@
+from typing import Iterable, Mapping
+
 from .. import main
 from ..ctx import MISSING, Ctx
 from ..exceptions import MissingClosingTagError, StrayClosingTagError
@@ -121,9 +123,12 @@ class Section(Node):
                 except TypeError:
                     data = data()
 
-        # if data is not a list we put it into one
+        # if data is not an iterable we put it into a list
         # so we can process it easily
-        if not isinstance(data, list) or not data:
+        if not data or not (
+            isinstance(data, Iterable)
+            and not isinstance(data, str | bytes | Mapping)
+        ):
             data = [data]
 
         handled = []
